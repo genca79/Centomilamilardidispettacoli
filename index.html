@@ -278,7 +278,7 @@
                 "Manifesto per", "Odissea nel", "Ballata del", "Tragedia del", "Elegia per", "Salmo del", "Apocalisse di", "Genesi del",
                 "Catasto del", "Inventario del", "Sussurro del", "Grido del", "Silenzio del", "Monumenti di", "Sinossi del", "Frammenti di",
                 "Appunti per", "Esercizi di", "Quaderni del", "Voci dal", "Respiri di", "Macerie di", "Orazioni per", "Preghiera laica del",
-                "Cartografia del", "Sismografia del", "Ecografia del", "Radiografia del", "Autopsia del", "Archeologia del", "Topografia del", "Report da...","Piccoli cedimenti...", "Come un uomo...","Di che paese è...", "Bollettino del..."
+                "Cartografia del", "Sismografia del", "Ecografia del", "Radiografia del", "Autopsia del", "Archeologia del", "Topografia del", "Report da...","Piccoli cedimenti...", "Come un uomo...","Di che paese è...", "Bollettino del...", "Studio per un..."
             ],
             titles_suffix: [
                 "Cemento Armato", "Anime Perse", "Confine Invalicabile", "Respiro Interrotto", "Silenzio Urbano", "Corpo Sgretolato", "Vuoto Pneumatico", "Margine Ferito",
@@ -815,79 +815,110 @@
             }, 2000); // 2 secondi di caricamento finto
         }
 
-        // --- 4. GENERAZIONE ONLINE (OpenAI API) ---
+      // --- 4. GENERAZIONE ONLINE (OpenAI API - POTENZIATA IBRIDA) ---
 
         async function generatePlayOnline(apiKey) {
             const theme = document.getElementById('theme').value.trim() || "Il Vuoto";
             const place = document.getElementById('place').value.trim() || "La Periferia";
             
-            // Checkboxes to Prompt Logic
-            const flawInstructions = {
-                "metafore": "VINCOLO OGGETTO SCENICO: Descrivi un 'Dispositivo' ASSURDO, GIGANTESCO e PERICOLOSO, costruito esclusivamente con MATERIALI DI RISULTA (macerie, lamiere taglienti, tubi arrugginiti). Deve rappresentare il TEMA ('" + theme + "') in modo letterale e ingombrante.",
-                "video": "VINCOLO VISIVO: Includi videoproiezioni o VIDEOMAPPING con disegni fatti dal vivo (tavoletta grafica) proiettati su superfici irregolari per spiegare didascalicamente il tema.",
-                "idealizzazione": "VINCOLO MORALE CAST: I personaggi 'marginali' sono saggi e puri; i 'borghesi' sono cinici e devono imparare dai primi.",
-                "estetica": "VINCOLO RECITAZIONE: Sottolinea che la 'verità' sta nella BASSA qualità tecnica (inciampi, lettura fogli, urla sgrammaticate).",
-                "fruizione": "VINCOLO FRUIZIONE PUNITIVA: Il pubblico DEVE stare scomodo (in ginocchio, al freddo, reggendo pesi).",
-                "moralismo": "VINCOLO FINALE: Lezione esplicita al pubblico sul comportamento etico corretto.",
-                "patriarcato": "VINCOLO DEMIURGO: Il Regista entra in scena, interrompe la finzione e dà ordini agli attori.",
-            };
+            // 1. COSTRUZIONE DELLA BOZZA "OFFLINE" (Il Canovaccio Floridiano)
+            // Usiamo il database locale per creare una struttura solida e piena di cliché corretti
+            
+            const draft_title = `"${pick(DB.titles_prefix)} ${pick(DB.titles_suffix)}"`;
+            const draft_subtitle = pick(DB.subtitles_templates).replace("[THEME]", theme);
+            
+            // Luogo base dal DB
+            const place_adj = pick(DB.places_adjectives);
+            const draft_place_base = pick(DB.places_templates)
+                                    .replace("[PLACE]", place)
+                                    .replace("[ADJECTIVE]", place_adj);
 
-            let promptAdditions = "";
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(chk => {
-                if (flawInstructions[chk.value]) promptAdditions += "- " + flawInstructions[chk.value] + "\n";
-            });
+            // Dispositivo base dal DB
+            const draft_device_base = `Al centro: ${pick(DB.metaphors_objects)}. ${pick(DB.device_descriptions)}`;
+            
+            // Cast base dal DB
+            const draft_cast_base = `${pick(DB.cast_groups)} e ${pick(DB.cast_groups)}. ${pick(DB.cast_notes)}`;
+            
+            // Azioni base dal DB
+            const draft_prologue = pick(DB.actions_prologue);
+            const draft_main = `${pick(DB.actions_main)} ${pick(DB.acting_notes)}`;
+            const draft_director = `${pick(DB.actions_director)} ${pick(DB.director_notes)}`;
+            const draft_epilogue = `${pick(DB.actions_epilogue)} ${pick(DB.epilogue_notes).replace("[THEME]", theme)}`;
+            const draft_punishment = pick(DB.fruition_punitive);
 
-            // UI Setup
+            // 2. COSTRUZIONE DEL PROMPT PER GPT
+            // Chiediamo all'IA di lavorare SU QUESTA BOZZA, non da zero.
+            
+            const userPromptContent = `
+                ECCO UNA BOZZA DI SPETTACOLO GENERATA DAL DATABASE (Stile Pietro Floridia):
+                
+                TITOLO: ${draft_title}
+                SOTTOTITOLO: ${draft_subtitle}
+                LUOGO (Base): ${draft_place_base}
+                DISPOSITIVO (Base): ${draft_device_base}
+                CAST (Base): ${draft_cast_base}
+                FRUIZIONE PUNITIVA (Base): ${draft_punishment}
+                
+                SVOLGIMENTO (Base):
+                - Prologo: ${draft_prologue}
+                - Azione: ${draft_main}
+                - Interruzione: ${draft_director}
+                - Epilogo: ${draft_epilogue}
+
+                ---
+                
+                IL TUO COMPITO (DRAMMATURGO REVISORE):
+                Prendi questa bozza e RISCRIVILA per renderla PERFETTAMENTE ADERENTE al TEMA: "${theme}" e al LUOGO: "${place}".
+                
+                REGOLE DI RISCRITTURA:
+                1. Mantieni la struttura e il tono retorico/solenne della bozza.
+                2. MODIFICA GLI OGGETTI E I MATERIALI: Se la bozza dice "sedie" ma il tema è "Acqua", trasformale in "sedie galleggianti" o "fusti d'acqua". Usa i dettagli del Luogo "${place}" per modificare la scenografia (es. usa i detriti specifici di quel luogo).
+                3. AGGIUNGI INVENZIONI INEDITE: Inserisci dettagli sensoriali (odori, rumori specifici di quel tema) che non sono nel database.
+                4. ESASPERA I DIFETTI: Rendi la fruizione ancora più scomoda e la recitazione ancora più imbarazzante, collegandole al tema (es. "Il pubblico deve stare in apnea per capire l'acqua").
+                
+                STRUTTURA OUTPUT OBBLIGATORIA (Usa HTML semplice):
+                <h3>TITOLO</h3>
+                <p>...</p>
+                <h3>SOTTOTITOLO</h3>
+                <p>...</p>
+                <h3>IL LUOGO</h3>
+                <p>...</p>
+                <h3>IL DISPOSITIVO</h3>
+                <p>...</p>
+                <h3>CAST</h3>
+                <p>...</p>
+                <h3>FRUIZIONE PUNITIVA</h3>
+                <p>...</p>
+                <h3>SVOLGIMENTO</h3>
+                <ul>...</ul>
+            `;
+
             document.getElementById('loadingSection').classList.remove('hidden');
             document.getElementById('outputSection').classList.add('hidden');
             const intervalId = rotateLoadingText();
 
             const systemPrompt = `
-                Sei un generatore parodistico di teatro sociale impegnato (stile Pietro Floridia/Cantieri Meticci), ma DEVI SEMBRARE SERIO.
-                La tua missione è esasperare i DIFETTI tipici di questo teatro (retorica, bruttura estetica, disagio, didascalico, banale, consolatorio per il pubblico ) presentandoli come scelte artistiche alte.
+                Sei l'Alter Ego Digitale di Pietro Floridia (Regista di Teatro Sociale Impegnato).
+                Il tuo compito è prendere un canovaccio esistente e "sporcarlo" con la realtà specifica del tema e del luogo indicati, usando il tuo lessico caratteristico.
                 
-                INPUT UTENTE: Nella generazione del testo tiene conto in modo specifico di questi due parametri:
-                - TEMA (IL DOLORE): "${theme}"
-                - LUOGO (LA FERITA): "${place}"
-
-                OBIETTIVO:
-                Scrivi la SCHEDA ARTISTICA di un progetto site-specific che sia involontariamente comico per quanto è tragico e scomodo.
-                
-                REGOLE DI ADERENZA RADICALE E DIFETTI OBBLIGATORI:
-                1. SCENOGRAFIA ("DISPOSITIVO"): Deve essere GIGANTESCA, PERICOLOSA e FATTA DI SPAZZATURA trovata in "${place}". Deve rappresentare LETTERALMENTE il tema "${theme}" (es. Tema "Soldi" -> Montagna di monete di ruggine che crolla). Sottolinea che è instabile e tagliente.
-                2. RECITAZIONE ("FRAGILITÀ"): Specifica che gli attori NON sanno recitare (leggono fogli, inciampano, urlano). Definisci questo "urgenza espressiva" o "rifiuto dell'accademia".
-                3. FRUIZIONE PUNITIVA: Il pubblico deve SOFFRIRE fisicamente (stare al freddo, in ginocchio, reggere pesi, essere bendato). Questo serve a "far sentire il tema".
-                4. CAST ("METICCIATO"): I migranti/marginali sono Santi infallibili; i borghesi/italiani sono colpevoli e confusi.
-                5. IL REGISTA: Deve intervenire come un dittatore illuminato che interrompe lo spettacolo per dare lezioni di vita.
-                6. TITOLO: Deve essere lunghissimo, pretenzioso e contenere parole come "Liturgia", "Cantiere", "Respiro".
-
-                VOCABOLARIO OBBLIGATORIO:
-                "Meticciato", "Dispositivo scenico", "Attraversamento", "Ferita urbana", "Maieutica", "Corpo a corpo", "Materiali di risulta", "Sbiancamento", "Urgenza".
-
-                STRUTTURA OUTPUT (Usa HTML semplice):
-                <h3>TITOLO</h3> <p><em>(Titolo pomposo e lunghissimo su "${theme}")</em></p>
-                
-                <h3>IL LUOGO (LA FERITA SPECIFICA)</h3> 
-                <p><em>(Descrizione di "${place}" enfatizzando sporcizia, freddo e degrado come valori positivi)</em></p>
-                
-                <h3>IL DISPOSITIVO (LA GRANDE METAFORA DI "${theme}")</h3> 
-                <p><em>(Descrivi la struttura enorme, pericolante e fatta di rifiuti che rappresenta "${theme}")</em></p>
-                
-                <h3>LA COMUNITÀ IN SCENA</h3> <p><em>(Descrivi il cast misto con gerarchie morali rigide)</em></p>
-                
-                <h3>FRUIZIONE PUNITIVA</h3> 
-                <p><em>(Dettaglia la tortura fisica inflitta al pubblico per "attivarlo")</em></p>
-                
-                <h3>SVOLGIMENTO</h3> 
-                <ul>
-                    <li><strong>Accoglienza:</strong> ...</li>
-                    <li><strong>Rito Centrale (Recitazione Fragile):</strong> ...</li>
-                    <li><strong>Interruzione Maieutica (Il Dittatore):</strong> ...</li>
-                    <li><strong>Epilogo (La Lezione Morale):</strong> ...</li>
-                </ul>
-
-                APPLICA I VINCOLI SELEZIONATI DALL'UTENTE IN MODO ESASPERATO:
-                ${promptAdditions}
+                VOCABOLARIO OBBLIGATORIO (Usa questi termini il più possibile):
+                - "Meticciato" / "Mescolanza" (Concetto chiave)
+                - "Dispositivo" (per riferirti alla scenografia o alla struttura)
+                - "Attraversamento" (fisico e simbolico)
+                - "Ferita" (riferito al luogo o alla società)
+                - "Maieutica" (il tuo metodo di lavoro direttivo)
+                - "Sbiancamento" (il male da combattere, l'omologazione)
+                - "Habitat" / "Humus" (invece di "ambiente")
+                - "Corpo a corpo" (con la realtà, con il testo)
+                - "Coagulo" (riferito a gruppi di persone o tensioni)
+                - "Urgenza" (la giustificazione per la scarsa qualità tecnica)
+                - "Restituzione" (invece di spettacolo)
+                - "Inciampo" (errore valorizzato)
+                - "Polifonia" (caos di voci)
+                - "Sconfinamento" (uscire dai ruoli)
+                - "Fragilità" (valore supremo)
+                - "Corpo a corpo"
+                - "Fardello dell'uomo bianco"
             `;
 
             try {
@@ -901,9 +932,9 @@
                         model: "gpt-3.5-turbo",
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "Genera il progetto." }
+                            { role: "user", content: userPromptContent }
                         ],
-                        temperature: 0.8
+                        temperature: 0.85 // Alta temperatura per favorire le "invenzioni"
                     })
                 });
 
