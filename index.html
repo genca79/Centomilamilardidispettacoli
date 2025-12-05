@@ -178,7 +178,7 @@
                 Generatore Automatico per il Teatro Sociale
             </h2>
             <p class="mt-4 text-sm md:text-base italic">
-                "Perchè scrivere nuovi spettacoli quando puoi generare milioni di combinazioni di disagio e metafore didascaliche?"
+                "La variabilità del disagio è infinita."
             </p>
         </header>
 
@@ -198,7 +198,7 @@
             </div>
 
             <h3 class="text-xl mb-4 border-b-2 border-black pb-2">2. Seleziona gli Ingredienti di Teatro Sociale</h3>
-            <p class="text-xs mb-2 italic">Seleziona i "bug" artistici da implementare nella trama:</p>
+            <p class="text-xs mb-2 italic">Seleziona i "bug" artistici da sottendere alla costruzione dello spettacolo</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6 bg-gray-100 p-4 border border-black">
                 <label class="checkbox-container">Scenografie Ingombranti e Pericolose
                     <input type="checkbox" id="chk_metafore" value="metafore" checked>
@@ -216,7 +216,7 @@
                     <input type="checkbox" id="chk_estetica" value="estetica" checked>
                     <span class="checkmark"></span>
                 </label>
-                <label class="checkbox-container">Fruizione Punitiva
+                <label class="checkbox-container">Fruizione Punitiva per gli spettatori
                     <input type="checkbox" id="chk_fruizione" value="fruizione" checked>
                     <span class="checkmark"></span>
                 </label>
@@ -224,7 +224,7 @@
                     <input type="checkbox" id="chk_moralismo" value="moralismo" checked>
                     <span class="checkmark"></span>
                 </label>
-                <label class="checkbox-container">Visione Patriarcale del Regista
+                <label class="checkbox-container">Visione Patriarcale e Paternalista del Regista
                     <input type="checkbox" id="chk_patriarcato" value="patriarcato" checked>
                     <span class="checkmark"></span>
                 </label>
@@ -238,17 +238,20 @@
         <!-- API Config Section -->
         <div class="brutalist-box p-6 mb-8 bg-gray-50">
             <h3 class="text-xl mb-4 border-b-2 border-black pb-2 flex justify-between items-center">
-                <span>Impostazioni IA</span>
+                <span>Queste generatore è proletario e fa volutamente errori di sintassi e grammatica. Se sei un borghese e vuoi coerenza grammaticale e semantica, usa la fottuta intelligenza artificiale...</span>
                 <span id="modeIndicator" class="mode-badge mode-offline">MODALITÀ OFFLINE</span>
             </h3>
-            <p class="text-xs mb-2">Lascia vuoto per usare il generatore casuale. Inserisci una API Key OpenAI per usare l'IA.</p>
-            <input type="password" id="apiKey" class="input-field mb-0" placeholder="sk-..." autocomplete="off" oninput="updateMode()">
+            <p class="text-xs mb-2">Lascia vuoto per usare il generatore casuale, proletario e sgrammaticato. Altrimenti, inserisci la tua costosissima Chiave API OpenAI qui </p>
+            <input type="password" id="apiKey" class="input-field mb-2" placeholder="sk-..." autocomplete="off" oninput="updateMode()">
+            <button id="aiToggleBtn" onclick="toggleAI()" class="w-full bg-red-600 text-white font-bold py-2 text-sm border-2 border-black hover:bg-black hover:text-white transition-colors">
+                Attiva IA (GPT)
+            </button>
         </div>
 
         <!-- Loading State -->
         <div id="loadingSection" class="hidden text-center py-8">
             <div class="loader mb-4"></div>
-            <p id="loadingText" class="text-lg font-bold animate-pulse">Praticando il meticciato...</p>
+            <p id="loadingText" class="text-lg font-bold animate-pulse">Reclutando figuranti non retribuiti...</p>
         </div>
 
         <!-- Output Section -->
@@ -260,44 +263,88 @@
                 <!-- Il contenuto verrà iniettato qui -->
             </div>
             
-            <div class="mt-8 pt-4 border-t-2 border-dashed border-gray-400 text-center">
-                <button onclick="copyToClipboard()" class="text-sm underline hover:text-red-600">Copia Progetto per Bando Ministeriale</button>
+            <div class="mt-8 pt-4 border-t-2 border-dashed border-gray-400 text-center space-y-2">
+                <div class="flex flex-col md:flex-row md:justify-center md:space-x-4 space-y-2 md:space-y-0">
+                    <button onclick="toggleEditMode()" class="text-sm underline hover:text-red-600">Modifica/Testo</button>
+                    <button onclick="saveEditedContent()" class="text-sm underline hover:text-red-600">Salva Modifiche</button>
+                    <button onclick="copyToClipboard()" class="text-sm underline hover:text-red-600">Copia Progetto</button>
+                    <button onclick="exportPDF()" class="text-sm underline hover:text-red-600">Salva PDF</button>
+                </div>
+                <p id="editHint" class="text-xs italic text-gray-600 hidden">ModalitÇÿ modifica attiva: clicca nel testo e scrivi, poi premi "Salva Modifiche".</p>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. MODALITÀ OFFLINE (Grammatica Generativa FLORIDIANA) ---
-        
+        // --- GRAMMATICA GENERATIVA COMBINATORIA ---
+        const LEXICON = {
+            adj: [
+                "fragile", "urgente", "necessario", "carsico", "poroso", "sbiancato", "meticcio", 
+                "liminale", "periferico", "assente", "interrotto", "viscerale", "materico", 
+                "indicibile", "sospeso", "doloroso", "collettivo", "sfilacciato", "arrugginito",
+                "pre-politico", "post-umano", "clandestino", "sgraziato", "autentico", "marginale",
+                "precario", "incandescente", "sporco", "gelido", "soffocante", "labirintico",
+                "catastrofico", "residuo", "incompiuto", "provvisorio", "abusivo", "tossico",
+                "ferito", "amputato", "silenzioso", "assordante", "liquido", "faticoso", "estenuante"
+            ],
+            noun: [
+                "dispositivo", "coagulo", "ferita", "soglia", "attraversamento", "corpo a corpo",
+                "maieutica", "sbiancamento", "residuo", "maceria", "habitus", "memoria",
+                "radice", "confine", "margine", "abisso", "silenzio", "urlo", "inciampo",
+                "fallimento", "resistenza", "rito", "liturgia", "assemblea", "barricata",
+                "zattera", "nave", "muro", "polmone", "respiro", "assenza", "cicatrice",
+                "cantiere", "archivio", "frammento", "relitto", "geografia", "sismografia", "fardello"
+            ],
+            verb: [
+                "abitare", "sconfinare", "attraversare", "interrogare", "risignificare", "decostruire",
+                "esporre", "violare", "ricucire", "disseppellire", "amplificare", "negare", 
+                "accogliere", "respingere", "fratturare", "coagulare", "precipitare", "inabissarsi",
+                "didascalizzare", "ferire", "suturare", "invadere", "sabotare", "occupare",
+                "contaminare", "ibridare", "sfondare", "trattenere", "restituire", "mappare"
+            ],
+            materials: [
+                "tubi innocenti arrugginiti", "lamiere ondulate taglienti", "sedie di formica spaiate",
+                "bancali di legno marcio", "teli di plastica sporchi", "vecchi televisori a tubo catodico",
+                "copertoni esausti", "valigie di cartone sfondate", "reti da pesca impigliate",
+                "scarpe senza lacci", "libri bagnati", "calcinacci veri", "fusti di benzina vuoti",
+                "cavi elettrici scoperti", "neon tremolanti", "sacchi di juta pieni di sabbia",
+                "ghiaccio che si scioglie", "pane secco", "terra di cantiere", "bottiglie schiacciate",
+                "vestiti dismessi", "rottami ferrosi", "nastro adesivo da pacchi", "cartongesso umido",
+                "cassette della frutta marce", "filo spinato", "mattoni forati", "sabbia nera", "vetri rotti"
+            ]
+        };
+
         const DB = {
-            // TITOLI: Solenni, evocativi, legati a navigazione, cantieri, ferite.
             titles_prefix: [
-                "Oratorio per", "Liturgia di", "Requiem del", "Sinfonia di", "Cronache dal", "Lamento per", "Passione di", "Eucarestia del", 
-                "Vangelo secondo il", "Arcipelago di", "Atlante del", "Geografia del", "Cantico per", "Rovina del", "Anatomia di",
-                "Diario Minimo del", "Cantiere per", "Utopia del", "Processo al", "Litania del", "Archivio del", "Testimonianza del",
-                "Manifesto per", "Odissea nel", "Ballata del", "Tragedia del", "Elegia per", "Salmo del", "Apocalisse di", "Genesi del",
-                "Catasto del", "Inventario del", "Sussurro del", "Grido del", "Silenzio del", "Monumenti di", "Sinossi del", "Frammenti di",
-                "Appunti per", "Esercizi di", "Quaderni del", "Voci dal", "Respiri di", "Macerie di", "Orazioni per", "Preghiera laica del",
-                "Cartografia del", "Sismografia del", "Ecografia del", "Radiografia del", "Autopsia del", "Archeologia del", "Topografia del", "Report da...","Piccoli cedimenti...", "Come un uomo...","Di che paese è...", "Bollettino del...", "Studio per un..."
+                "Oratorio per", "Liturgia di", "Requiem del", "Vangelo secondo il", "Arcipelago di", 
+                "Atlante del", "Geografia del", "Cantico per", "Rovina del", "Anatomia di",
+                "Diario Minimo del", "Cantiere per", "Utopia del", "Processo al", "Litania del", 
+                "Archivio del", "Testimonianza del", "Passione di", "Eucarestia del", "Sinfonia di",
+                "Lamento per", "Cronache dal", "Report da", "Piccoli cedimenti del", "Il Violino del",
+                "L'Ultimo Icaro del", "La Tempesta di", "Il Labirinto di", "Buchi nel", "Il Naufragio del",
+                "Sismografia del", "Ecografia del", "Radiografia del", "Autopsia del", "Archeologia del", 
+                "Topografia del", "Vespri del", "Rosario di", "Odissea minima del", "Piccola apocalisse del",
+                "Manuale di", "Esercizi di", "Quaderni del", "Voci dal", "Respiri di", "Macerie di",
+                "Teoria del", "Pratica del", "Estetica del", "Politica del", "Poetica del", "Etica del"
             ],
             titles_suffix: [
-                "Cemento Armato", "Anime Perse", "Confine Invalicabile", "Respiro Interrotto", "Silenzio Urbano", "Corpo Sgretolato", "Vuoto Pneumatico", "Margine Ferito",
-                "Suolo Negato", "Ventre Freddo", "Ricordo Sbiancato", "Orizzonte Chiuso", "Tempo Sospeso", "Paesaggio Tossico", "Muro Invisibile", "Grido Soffocato",
-                "Futuro Anteriore", "Passato Prossimo", "Presente Continuo", "Mare di Plastica", "Vento Contrario", "Popolo Assente",
-                "Rifiuto Solido", "Bordo Frastagliato", "Sonno della Ragione", "Cielo di Piombo", "Sangue e Catrame", "Ferro Vecchio",
-                "Sogno Interrotto", "Viaggio Immobile", "Gesto Mancato", "Respiro Corto", "Passo Falso", "Memoria Liquida", "Radice Estirpata",
-                "Asfalto Bollente", "Vetro Rotto", "Polvere Sottile", "Fango Secco", "Acqua Sporca", "Luce Artificiale", "Ombra Lunga",
-                "Periferia Interiore", "Solitudine Collettiva", "Attesa Infinita", "Naufragio Quotidiano", "Esodo Urbano", "Silenzio Assordante",
-                "Vuoto a Perdere", "Vuoto a Rendere", "Spazio Negato", "Tempo Rubato", "Corpo Estraneo", "Materia Oscura", "Anima Nuda"
+                "Cemento", "Confine", "Respiro", "Silenzio", "Corpo", "Vuoto", "Margine", 
+                "Suolo", "Ventre", "Ricordo", "Orizzonte", "Tempo", "Muro", "Grido",
+                "Naufragio", "Rifiuto", "Sonno", "Sangue", "Ferro", "Viaggio", "Passo",
+                "Abisso", "Buio", "Fango", "Vetro", "Filo Spinato", "Polvere", "Ghiaccio",
+                "Cemento Armato", "Anime Perse", "Respiro Interrotto", "Corpo Sgretolato", 
+                "Vuoto Pneumatico", "Ventre Freddo", "Mare di Plastica", "Vento Contrario",
+                "Rifiuto Solido", "Cielo di Piombo", "Sangue e Catrame", "Ferro Vecchio",
+                "Passo Falso", "Radice Estirpata", "Asfalto Bollente", "Acqua Sporca",
+                "Dimenticatoio", "Discarica", "Periferia", "Esilio", "Nostalgia", "Rancore"
             ],
             
-            // SOTTOTITOLI: Spiegazioni pedagogiche che iniziano con "ovvero".
             subtitles_templates: [
-                "ovvero: Indagine scenica sul [THEME]",
+                "ovvero: Indagine scenica su [THEME]",
                 "ovvero: Piccolo manuale di resistenza al [THEME]",
                 "ovvero: Tentativo di esaurimento del concetto di [THEME]",
                 "ovvero: Appunti per una drammaturgia del [THEME]",
-                "ovvero: Il [THEME] come pratica di cittadinanza radicale",
+                "ovvero: [THEME] come pratica di cittadinanza radicale",
                 "ovvero: Esercizi spirituali per sopravvivere al [THEME]",
                 "ovvero: Cosa resta del [THEME] quando si spengono le luci",
                 "ovvero: Studio per corpi, macerie e [THEME]",
@@ -307,411 +354,443 @@
                 "ovvero: Il [THEME] spiegato ai pesci e agli architetti",
                 "ovvero: Dispositivo per l'elaborazione collettiva del [THEME]",
                 "ovvero: Tracce di [THEME] in un paesaggio post-umano",
-                "ovvero: Il [THEME] e altre catastrofi quotidiane",
-                "ovvero: Quando il [THEME] diventa paesaggio interiore",
+                "ovvero: [THEME] e altre catastrofi quotidiane",
+                "ovvero: Breve storia del [THEME] per non addetti ai lavori",
+                "ovvero: Quando il [THEME] diventa paesaggio",
                 "ovvero: Per una pedagogia del [THEME]",
                 "ovvero: Il [THEME] come forma di preghiera urbana",
                 "ovvero: Istantanee di [THEME] dal sottosuolo",
                 "ovvero: Il [THEME] visto da chi non ha voce",
                 "ovvero: Strategie di sopravvivenza al [THEME]",
-                "ovvero: Breve storia del [THEME] per non addetti ai lavori",
                 "ovvero: Il [THEME] e l'arte di scomparire",
                 "ovvero: Dialoghi impossibili sul [THEME]",
                 "ovvero: Il [THEME] come ferita aperta",
-                "ovvero: Come smettere di essere spettatori e diventare testimoni.",
-                "ovvero: Mappatura emotiva di un quartiere che non esiste più.",
-                "ovvero: Esercizi di verticalità in un mondo orizzontale.",
-                "ovvero: Liturgia per corpi non conformi e spazi occupati."
+                "ovvero: Non c'è mai posto sulla scialuppa per tutti",
+                "ovvero: Tentativo di volo sopra i muri del [THEME]",
+                "ovvero: Chi ha diritto a mettere radici nel [THEME]?",
+                "ovvero: Cronaca di un [THEME] annunciato",
+                "ovvero: Istruzioni per l'uso del [THEME]",
+                "ovvero: [THEME] o barbarie",
+                "ovvero: Il [THEME] ai tempi del colera sociale",
+                "ovvero: Prove tecniche di [THEME]",
+                "ovvero: Variazioni sul tema del [THEME]",
+                "ovvero: Requiem per il [THEME] che non c'è più"
             ],
 
-            // LUOGHI: Lessico specifico ("ferita", "ventre", "interstizio", "margine").
             places_templates: [
-                "Abbiamo scelto di abitare <strong>[PLACE]</strong> perché rappresenta [ADJECTIVE]. Qui il pubblico non entra, ma si infiltra come un virus benefico, abitando la ferita.",
-                "L'evento invade gli spazi di <strong>[PLACE]</strong>, trasformandolo in [ADJECTIVE]. Le pareti stesse trasudano la memoria di ciò che è stato, resistendo allo sbiancamento.",
-                "Non un palcoscenico, ma <strong>[PLACE]</strong>: un luogo che è [ADJECTIVE] e che ci costringe a ripensare le nostre coordinate etiche e spaziali.",
-                "Siamo andati a cercare l'invisibile presso <strong>[PLACE]</strong>, trovando [ADJECTIVE]. Lo spazio viene lasciato sporco e freddo per accentuare l'urgenza dell'incontro.",
-                "Lo spettacolo è site-specific, nato dalle viscere di <strong>[PLACE]</strong>, inteso come [ADJECTIVE]. Non c'è separazione tra platea e rovina, solo attraversamento.",
-                "Occupiamo <strong>[PLACE]</strong> per restituirlo alla città come [ADJECTIVE]. Un atto di riappropriazione poetica e politica che sfida la proprietà privata e crea nuovo humus.",
-                "La performance si snoda dentro <strong>[PLACE]</strong>, che diventa [ADJECTIVE], un dispositivo che amplifica le voci degli esclusi e dei sommersi.",
-                "In <strong>[PLACE]</strong>, considerato dalle mappe catastali come [ADJECTIVE], abbiamo fondato una repubblica temporanea della fragilità.",
-                "Il progetto nasce dall'urgenza di riscoprire <strong>[PLACE]</strong>, vedendolo finalmente come [ADJECTIVE]. Una rivelazione dolorosa che cura.",
-                "Attraversare <strong>[PLACE]</strong> significa accettare di entrare in [ADJECTIVE], dove le regole della città vetrina non valgono più.",
-                "<strong>[PLACE]</strong> non è uno sfondo, è un protagonista che sanguina, essendo [ADJECTIVE]. Noi siamo solo ospiti di questo cantiere umano.",
-                "Abbiamo forzato i lucchetti di <strong>[PLACE]</strong> per mostrare che è [ADJECTIVE]. Un atto illegale ma eticamente necessario per generare meticciato."
+                "Abbiamo scelto di abitare <strong>[PLACE]</strong> perché qui il [THEME] è tangibile come una [NOUN] [ADJ].",
+                "L'evento invade gli spazi di <strong>[PLACE]</strong>, trasformandolo in un dispositivo [ADJ] che interroga il [THEME].",
+                "Non un palcoscenico, ma <strong>[PLACE]</strong>: un luogo che [VERB] il [THEME] e ci costringe a [VERB] le nostre certezze.",
+                "Siamo andati a cercare l'invisibile presso <strong>[PLACE]</strong>, trovando solo [THEME] e [MATERIAL].",
+                "Lo spettacolo è site-specific, nato dalle viscere di <strong>[PLACE]</strong>, inteso come [NOUN] del [THEME].",
+                "Occupiamo <strong>[PLACE]</strong> per restituirlo alla città come [NOUN] [ADJ]. Un atto di [NOUN] contro il [THEME].",
+                "La performance si snoda dentro <strong>[PLACE]</strong>, che diventa una macchina [ADJ] per processare il [THEME].",
+                "In <strong>[PLACE]</strong>, considerato dalle mappe come [ADJ], abbiamo fondato una repubblica del [THEME].",
+                "Questo <strong>[PLACE]</strong>, solitamente [ADJ], stasera diventa la culla di una nuova umanità scalza.",
+                "Recitare in <strong>[PLACE]</strong> significa accettare che lo spazio è [ADJ] e che noi siamo intrusi.",
+                "Abbiamo forzato i lucchetti di <strong>[PLACE]</strong> per mostrare che è [ADJ]. Un atto illegale ma eticamente necessario.",
+                "Il rito si consuma nel ventre di <strong>[PLACE]</strong>, un non-luogo che abbiamo ribattezzato come [ADJ] per l'occasione.",
+                "<strong>[PLACE]</strong> sanguina [MATERIAL], rendendo impossibile ignorare il [THEME].",
+                "Trasformiamo <strong>[PLACE]</strong> in un archivio vivente del [THEME], usando solo [MATERIAL]."
+            ],
+
+            device_templates: [
+                "Una struttura enorme fatta di [MATERIAL] che [ACTION] minacciosamente sopra il pubblico, simboleggiando il [THEME].",
+                "Un labirinto costruito con [MATERIAL] che costringe gli attori a un continuo [NOUN] fisico con il [THEME].",
+                "Una montagna di [MATERIAL] che viene scalata e distrutta ciclicamente, rappresentando la fatica del [THEME].",
+                "Un muro di [MATERIAL] che separa la platea dagli attori, creando un senso di [NOUN] [ADJ] tipico del [THEME].",
+                "Una zattera precaria assemblata con [MATERIAL] che naviga in un mare di [MATERIAL], evocando il [THEME].",
+                "Un totem gigante di [MATERIAL] che vibra ed emette suoni [ADJ] legati al [THEME].",
+                "Un sistema di carrucole che solleva [MATERIAL] sopra le teste degli spettatori, evocando il peso schiacciante del [THEME].",
+                "Una gabbia fatta di [MATERIAL] al cui interno si svolge tutto il rito del [THEME].",
+                "Una diga di [MATERIAL] che perde acqua sporca ritmicamente, minacciando di allagare la prima fila e il [THEME].",
+                "Un ponte tibetano fatto di [MATERIAL], sospeso a tre metri d'altezza, su cui gli attori camminano bendati per il [THEME].",
+                "Una cattedrale di [MATERIAL] che viene costruita e decostruita freneticamente, come il [THEME] stesso.",
+                "Un gomitolo gigante di [MATERIAL] che rotola per la scena schiacciando tutto ciò che riguarda il [THEME].",
+                "Una bilancia industriale fatta di [MATERIAL] su cui ogni attore deve salire per pesare il proprio [THEME].",
+                "Un muro di ghiaccio vero che si scioglie trasformando il palco in una palude di [MATERIAL], metafora del [THEME] liquido.",
+                "Una serie di altalene fatte di [MATERIAL] che dondolano a vuoto, cantando il [THEME].",
+                "Un organo a canne costruito con [MATERIAL] che suona solo note [ADJ].",
+                "Un tappeto volante di [MATERIAL] che non riesce a decollare a causa del [THEME]."
             ],
             
-            places_adjectives: [
-                "una ferita aperta nel tessuto urbano", 
-                "un ventre di cemento dimenticato dalle amministrazioni", 
-                "un non-luogo che sanguina memoria operaia", 
-                "una cattedrale laica dell'abbandono post-industriale", 
-                "un interstizio di resistenza poetica tra i binari morti",
-                "una cicatrice architettonica che chiede di essere curata",
-                "un archivio di polvere e sogni interrotti",
-                "una zona temporaneamente autonoma dalla logica del profitto",
-                "uno scheletro di cemento che urla la sua solitudine",
-                "un labirinto burocratico fattosi materia",
-                "un monumento all'incuria che diventa tempio",
-                "un buco nero nella geografia della città vetrina",
-                "un avamposto di umanità residua",
-                "una frontiera invisibile tra centro e margine",
-                "un deserto di ruggine e speranze deluse",
-                "una necropoli di oggetti e affetti",
-                "un santuario del rifiuto",
-                "un ecosistema di fragilità",
-                "una distopia realizzata in mattoni e calce",
-                "un altare sacrificale del capitalismo tardivo",
-                "un monolite di silenzio nel caos metropolitano",
-                "un polmone intasato dallo smog della storia"
+            device_actions: [
+                "oscilla pericolosamente", "crolla e viene ricostruita", "perde liquidi scuri", 
+                "emette un ronzio assordante", "ruota su se stessa cigolando", "blocca la vista",
+                "costringe a camminare carponi", "riflette la luce in modo accecante", "puzza di chiuso",
+                "vibra ad ogni passo", "si sgretola lentamente", "gocciola acqua nera", "cigola sinistramente",
+                "scricchiola sotto il peso", "intrappola gli attori", "divide lo spazio in due", "incombe dall'alto"
             ],
 
-            // METAFORE: Navi, labirinti, alberi, polmoni, balene, muri.
-            metaphors_objects: [
-                "un POLMONE GIGANTE di plastica nera che respira rumorosamente e perde aria",
-                "una BALENA DI LAMIERE arrugginite alta sei metri che inghiotte gli attori",
-                "una NAVE DI RIFIUTI che oscilla pericolosamente sopra le teste del pubblico",
-                "un LABIRINTO DI TUBI INNOCENTI instabili, taglienti e vibranti",
-                "una MONTAGNA DI SEDIE accatastate pronta a crollare al minimo tocco",
-                "un MURO DI VECCHI TELEVISORI a tubo catodico che trasmettono neve statica",
-                "un CUORE MECCANICO alto 3 metri che perde olio nero sul pavimento",
-                "una FORESTA DI SEMAFORI spenti che pendono dal soffitto",
-                "una ZATTERA fatta interamente di bottiglie di plastica schiacciate",
-                "un TELAIO GIGANTE dove i fili sono sostituiti da catene arrugginite",
-                "un TAPPETO DI SCARPE SPAIATE che copre 200 metri quadri",
-                "una CLESSIDRA GIGANTE riempita non di sabbia ma di cenere",
-                "un ALBERO ROVESCIATO sospeso con le radici verso il soffitto (le radici dell'esilio)",
-                "una GABBIA TORACICA grande come una stanza fatta di neon tremolanti",
-                "una TAVOLA IMBANDITA lunga 20 metri con cibo pietrificato",
-                "un MAPPAMONDO CUBICO fatto di filo spinato",
-                "una CASCATA DI VESTITI usati che piove dal soffitto per 40 minuti",
-                "un ESERCITO DI MANICHINI mutilati che vengono spostati ossessivamente",
-                "un PONTE LEVATOIO che non porta da nessuna parte, sospeso nel vuoto",
-                "una NUVOLA TOSSICA ricreata con macchine del fumo e lana di vetro",
-                "un GRANDE ORECCHIO di gesso che ascolta i lamenti del sottosuolo",
-                "un OROLOGIO SENZA LANCETTE dal diametro di 5 metri che emette un ticchettio assordante",
-                "una BIBLIOTECA DI LIBRI BRUCIATI che vengono sfogliati dal vento dei ventilatori",
-                "una RETE DA PESCA chilometrica che intrappola detriti urbani e ricordi",
-                "un TOTEM DI PNEUMATICI esausti che cola gomma fusa (simulata)",
-                "un CALEIDOSCOPIO GIGANTE fatto di specchi rotti puntati sul pubblico",
-                "una SERRA DI PIANTE MORTE illuminate da luci stroboscopiche",
-                "un MULINO A VENTO scheletrico che gira a vuoto scricchiolando",
-                "un CANCELLO DI FERRO BATTUTO che si apre e chiude da solo sbattendo",
-                "Una DIGA DI VECCHI FRIGORIFERI che perde acqua sporca ritmicamente, minacciando di allagare la prima fila.",
-                "Una GIOSTRA ARRUGGINITA fatta di scale e cavicchi, che cigola coprendo le voci degli attori.",
-                "Una BALENA di gesso bianco tossico alta sei metri che si sgretola lentamente durante lo spettacolo.",
-                "Un MARE fatto con teli bianchi sporchi e pesabtu, acari e luci blu fredde, dove gli attori si muovono come naufraghi allergici alla polvere.",
-                "Un INGORGO di auto di proprietà degli attori dove gli spettatori vengono sequestrati per tutta la durata dello spettacolo.",
-                "Dei TAVOLI che diventano PALCOSCENICO, ma sono coperti di cibo avariato e sporcizia, costringendo gli attori a una recitazione in condizioni igieniche precarie.",
-                "Una MAPPA dell'Europa fatti di reti da pesca arrugginite e pezzi di vetro, che gli attori devono attraversare scalzi.",
-                "Un MURO di cartone bagnato che si sgretola lentamente, costringendo gli attori a una coreografia di fuga e sostegno reciproco.",
-                "Una CATTEDRALE DI CASSETTE DELLA FRUTTA marce che viene costruita e decostruita freneticamente per tutta la durata dello spettacolo.",
-                "Un MURO DI GHIACCIO vero che si scioglie lentamente sotto i riflettori, trasformando il palco in una palude di fango.",
-
-            ],
-
-            // DISPOSITIVI: Materiali di risulta, instabilità, pericolo.
-            device_descriptions: [
-                "È un dispositivo scenico costruito con 'materiali di risulta' e lamiere arrugginite, volutamente instabile, che costringe gli attori a un continuo 'corpo a corpo' con il pericolo fisico.",
-                "Assemblata con traversine ferroviarie intrise di creosoto e cavi d'acciaio sfilacciati, la scenografia vibra minacciosamente ad ogni passo, metafora della precarietà esistenziale.",
-                "Un ammasso di scarti industriali non trattati che impone una 'drammaturgia del rischio': ogni movimento sbagliato può causare un crollo reale, tenendo viva l'attenzione.",
-                "Costruita in equilibrio precario su bidoni tossici sigillati male, la struttura dondola sopra la testa del pubblico, creando una tensione tangibile e condivisa.",
-                "Il dispositivo è un labirinto di vetro rotto e ferro battuto, dove gli attori devono muoversi scalzi per dimostrare la loro fiducia cieca nel gruppo.",
-                "Realizzata interamente con mobili recuperati da case alluvionate, la struttura emana un odore di muffa che diventa parte integrante dell'esperienza olfattiva.",
-                "Una torre di impalcature traballanti tenute insieme solo da nastro adesivo e forza di volontà collettiva, simbolo della fragilità sociale.",
-                "Un piano inclinato coperto di sapone e olio motore, che rende ogni tentativo di verticalità una metafora estenuante e pericolosa della scalata sociale.",
-                "Un groviglio di cavi elettrici scoperti (messi in sicurezza ma visivamente letali) che pende come una spada di Damocle sulla comunità.",
-                "Una barricata di sacchi di sabbia umidi che perdono contenuto, rendendo il pavimento un pantano impraticabile, 'humus' sporco.",
-                "Strutture di cartongesso marcio che si sgretolano progressivamente durante lo spettacolo, coprendo tutti di polvere bianca (il fantasma dello sbiancamento).",
-                "Un sistema di carrucole arrugginite che solleva pesi enormi sopra la platea, cigolando sinistramente, evocando il lavoro invisibile.",
-                "Pareti fatte di lamiere ondulate che amplificano ogni urto come un tuono, creando un ambiente sonoro ostile e industriale.",
-                "Un pavimento flottante su molle sfondate che rende impossibile stare fermi senza perdere l'equilibrio, costringendo al sostegno reciproco.",
-                "Una selva di tondini di ferro che spuntano dal cemento, costringendo a una coreografia della sopravvivenza.",
-                "Una scala a pioli di legno marcio che viene stesa a terra per diventare il binario morto di una deportazione burocratica, poi alzata verticalmente come la spina dorsale di un gigante malato di scoliosi sociale, e infine caricata sulla schiena di un attore che crolla sotto il peso, trasformandosi nelle ali di piombo di un angelo che ha rinunciato al volo.",
-                "Un tavolo di formica zoppo che viene rovesciato per diventare una zattera che imbarca volontariamente acqua nera, poi alzato di taglio come la porta blindata di un bunker inaccessibile ai poveri, e infine usato come pressa idraulica manuale per schiacciare metaforicamente i sogni delle nuove generazioni.",
-                "Un immenso telo di plastica sporco di grasso industriale che viene agitato dal basso per diventare uno tsunami di rifiuti tossici, poi avvolto stretto attorno ai corpi sudati come un bozzolo di soffocamento pre-natale, e infine teso fino a strapparsi rumorosamente per simboleggiare l'irreversibile rottura del patto sociale.",
-                "Una catasta di sedie di ferro arrugginite che viene scalata a mani nude come una montagna di pratiche evase, poi disposta in cerchi concentrici come un parlamento di fantasmi muti, e infine lanciata violentemente contro le pareti di lamiera per simulare il rumore assordante di una guerra interiore.",
-                "Un groviglio di tubi innocenti che viene montato stretto attorno agli attori come un esoscheletro paralizzante, poi percosso con chiavi inglesi per diventare l'urlo meccanico di una fabbrica che chiude, e infine smontato pezzo per pezzo per costruire una prigione invisibile che occupa tutto il palco.",
-                "Una montagna di cappotti bagnati che viene trascinata a fatica come una rete da pesca piena di cadaveri senza nome, poi appesa al soffitto con ganci da macellaio come una foresta di impiccati, e infine indossata tutta insieme da un solo attore che diventa una massa informe e mostruosa di identità negate.",
-                "Delle valigie di cartone riempite di pietre che vengono usate per murare vivo un attore al centro della scena, poi aperte per rivelare che contengono solo polvere di macerie, e infine allineate come bare in una fossa comune mentre il pubblico è costretto a guardare in silenzio.",
-                "Un gomitolo di filo spinato che viene srotolato per diventare il confine sanguinoso tra il 'Noi' e il 'Loro', poi teso come corda di un violino gigante che emette suoni stridenti, e infine usato per cucire insieme i vestiti degli attori in un unico corpo collettivo che non può più muoversi.",
-                "Delle bottiglie di plastica schiacciate che vengono unite per formare un polmone artificiale che non riesce a respirare, poi usate come mattoni per costruire una torre di Babele instabile che crolla addosso al coro, e infine sparse a terra per costringere gli attori a camminare su un tappeto di rumore insopportabile.",
-                "Dei fogli di giornale vecchi di dieci anni che vengono masticati dagli attori e sputati per costruire un nido di vespe, poi usati per bendare gli occhi del pubblico in prima fila, e infine appallottolati per lapidare il protagonista che cerca di dire la verità.",
-                "Delle torce elettriche morenti che vengono usate per interrogare violentemente il pubblico, poi legate insieme per creare un faro che punta nel vuoto, e infine sbattute ritmicamente a terra fino a rompersi, lasciando la scena nel buio totale e definitivo.",
-                "Un pezzo di ghiaccio grande come un uomo che viene abbracciato dagli attori per scaldarlo col proprio corpo, poi scolpito freneticamente con cacciaviti per dargli una forma umana che si scioglie subito, e infine l'acqua risultante viene bevuta come sacramento dell'effimero.",
-
-
-            ],
-
-            // CAST: Meticciato, gruppi eterogenei, non professionisti.
             cast_groups: [
-                "un coro di 20 anziane del quartiere che tossiscono ritmicamente",
-                "un gruppo di richiedenti asilo scalzi che portano in mano zolle di terra",
-                "15 adolescenti 'neet' che fissano il vuoto indossando felpe col cappuccio",
-                "ex operai della zona industriale che battono su fusti di benzina vuoti",
-                "madri del quartiere che reggono foto sbiadite dei loro figli",
-                "rider delle consegne a domicilio che recitano il menu del giorno come una preghiera",
-                "studenti fuorisede che trascinano valigie piene di pietre",
-                "badanti dell'Est Europa che cantano nenie nella loro lingua madre",
-                "bambini di una scuola elementare vestiti da alberi abbattuti",
-                "un gruppo di disoccupati che costruiscono e distruggono muri di cartone",
-                "operatori ecologici che danzano con le scope in un valzer triste",
-                "detenuti in permesso premio che misurano lo spazio a passi",
-                "ex tossicodipendenti che raccontano i loro sogni ricorrenti",
-                "un gruppo di burocrati comunali che timbrano fogli bianchi all'infinito",
-                "rifugiati climatici che portano addosso i segni della siccità",
-                "un coro di voci bianche che urla insulti politici",
-                "pescatori che rammendano reti fatte di capelli umani",
-                "anziani con deambulatori che vengono usati come percussioni",
-                "infermieri in turno di notte con le occhiaie disegnate",
-                "musicisti di strada a cui sono stati tolti gli strumenti",
-                "persone senza fissa dimora che leggono brani di alta finanza",
-                "un gruppo di turisti spaesati con trolley che vengono ignorati da tutti",
-                "Un coro di ex dirigenti d'azienda licenziati che puliscono il pavimento con spazzolini da denti in segno di espiazione.",
-                "Un gruppo di adolescenti hikikomori che partecipano allo spettacolo via webcam, proiettati su lenzuola stese ad asciugare.",
-                "Un ensemble di portieri di notte che raccontano i segreti della città mentre lavorano a maglia.",
-                "Un gruppo di 20 rifugiati politici che arrivano da 134 paesi diversi, ognuno con una storia di fuga unica.",
-                "Un gruppo di attori molto bassi che sostiuscono i bambini che non sono venuti allo spettacolo",
-                "una squadra di NBA che sostiusce gli attori neri poveri che non sono stati invitati allo spettacolo",
-                "insegnanti di liceo di terza generazione che recitano nella loro lingua madre di origine senza conoscerla",
-                "un gruppo di musulmani che interpretano rabbini che interpretano preti che interpretano imam, che interpretano buddisti atei",
-                "attori italiani che recitano in dialetto perchè sono dei cani a recitare in italiano",
-                "Un ensemble di badanti dell'Est Europa che recitano Antigone nella loro lingua madre mentre impastano il pane in scena.",
-                "Una squadra di addetti alle pulizie notturne che danzano con i moci, trasformando il gesto del lavare in una coreografia della cancellazione della memoria.",
-
+                "un coro di anziane del quartiere", "un gruppo di richiedenti asilo scalzi", 
+                "adolescenti 'neet' in felpa", "ex operai della zona industriale", 
+                "madri che reggono foto", "rider delle consegne a domicilio", 
+                "studenti fuorisede con valigie", "badanti dell'Est Europa", 
+                "bambini vestiti da alberi", "disoccupati che costruiscono muri",
+                "operatori ecologici danzanti", "detenuti in permesso premio",
+                "ex tossicodipendenti", "burocrati comunali smarriti",
+                "rifugiati climatici", "pescatori di rane", "insegnanti precarie",
+                "ex dirigenti d'azienda licenziati", "adolescenti hikikomori via webcam",
+                "portieri di notte che lavorano a maglia", "giocatori di bocce",
+                "operatori di call center urlanti", "condomini litigiosi",
+                "attori che fingono di non essere attori", "turisti spaesati con trolley",
+                "musicisti di strada senza strumenti", "infermieri in turno di notte",
+                "contadini senza terra", "poeti analfabeti", "custodi di cimiteri"
             ],
 
-            // NOTE CAST: Idealizzazione del marginale vs colpevolizzazione borghese.
-            cast_notes: [
-                "(Nota: I soggetti marginali sono rappresentati come figure di pura saggezza ancestrale, vestiti di lino bianco, mentre i cittadini comuni appaiono grigi, curvi e corrotti dal benessere).",
-                "(Nota: Si applica una rigida gerarchia etica: chi ha sofferto ha diritto di parola e occupa il centro, chi è borghese deve tacere e stare ai margini).",
-                "(Nota: I migranti sono diretti come creature angeliche prive di difetti, portatori di una verità che l'Occidente ha dimenticato, gli italiani come automi senza anima).",
-                "(Nota: La purezza dello sguardo del rifugiato viene contrapposta alla cecità cinica dell'impiegato statale, in un manicheismo senza sfumature).",
-                "(Nota: I bambini e gli anziani sono gli unici detentori della logica, mentre gli adulti in età lavorativa sono rappresentati come mostri balbettanti).",
-                "(Nota: L'autenticità biografica dei partecipanti viene usata come scudo contro qualsiasi critica estetica: 'non stanno recitando, sono').",
-                "(Nota: I personaggi positivi camminano lentamente e guardano in alto, quelli negativi corrono freneticamente guardando i cellulari).",
-                "(Nota: Vige il principio della 'superiorità della vittima': più un personaggio ha subito, più la sua voce è amplificata).",
-                "(Nota: Non ci sono personaggi, ma 'funzioni sociali': Il Povero, L'Escluso, Il Potente (che è sempre ridicolo)).",
-                "(Nota: La voce del migrante deve essere sempre amplificata, quella del cittadino locale deve essere sussurrata o strozzata).",
-                "(Nota: Gli anziani sono trattati come oracoli viventi, posizionati su troni fatti di copertoni usati).",
-                "(Nota sulla Musica): Vietato andare a tempo. Il ritmo è una costrizione. Il coro deve cantare ognuno con il proprio tempo interiore, creando una cacofonia che noi chiameremo 'polifonia della resistenza'.",
-                "(Nota sui Costumi): Nessun costume teatrale. Gli attori devono indossare i propri vestiti, preferibilmente quelli che usano per dormire",
-                "(Nota di Regia): Anche se parliamo di 'creazione collettiva', è chiaro che senza il Regista questi corpi sarebbero solo massa inerte."
+            cast_notes_templates: [
+                "(Nota: I [GROUP] rappresentano la purezza del [THEME], mentre gli altri sono corrotti).",
+                "(Nota: Si applica una gerarchia: chi ha subito il [THEME] ha diritto di parola, gli altri tacciono).",
+                "(Nota: L'autenticità dei [GROUP] viene usata come scudo contro qualsiasi critica estetica).",
+                "(Nota: I [GROUP] non recitano, 'sono'. La loro presenza è un atto di [NOUN] [ADJ]).",
+                "(Nota: Il Regista guida i [GROUP] con mano ferma, estraendo da loro il [NOUN] del [THEME]).",
+                "(Nota: La voce del migrante deve essere amplificata, quella del cittadino locale sussurrata).",
+                "(Nota: I bambini non devono sorridere mai. Rappresentano il futuro tradito del [THEME]).",
+                "(Nota: Gli anziani sono trattati come oracoli viventi su troni di [MATERIAL]).",
+                "(Nota: Vietato il trucco scenico, le occhiaie devono essere reali per il [THEME]).",
+                "(Nota: Il contatto fisico tra gli attori deve essere un 'corpo a corpo' goffo e sudato)."
             ],
 
-            // AZIONI PROLOGO: Scomodità, schedatura, divisione.
+            fruition_templates: [
+                "Il pubblico deve restare in ginocchio su [MATERIAL] per capire il [THEME].",
+                "Gli spettatori devono reggere pesanti pezzi di [MATERIAL] per tutto il tempo.",
+                "Si viene bendati e guidati tra ostacoli di [MATERIAL] mentre si ascoltano suoni di [THEME].",
+                "L'ingresso è consentito solo dopo aver confessato un peccato legato al [THEME].",
+                "Gli spettatori sono stipati in un container pieno di [MATERIAL] per 20 minuti.",
+                "Non ci sono sedie: si sta in equilibrio su [MATERIAL] instabili.",
+                "Il pubblico viene diviso in 'vittime' e 'carnefici' del [THEME] all'ingresso.",
+                "Bisogna tenere le braccia alzate in segno di resa al [THEME].",
+                "Il pubblico deve guardare lo spettacolo attraverso il buco della serratura.",
+                "Si è costretti a sedere su blocchi di sale grosso per sentire il [THEME].",
+                "Bisogna indossare cuffie antirumore e intuire le battute dal labiale.",
+                "Gli spettatori sono legati l'uno all'altro con un filo di lana rossa.",
+                "L'ingresso avviene strisciando dentro un tubo di areazione smontato.",
+                "Si può guardare solo attraverso specchi deformanti.",
+                "Bisogna stare su una gamba sola ogni volta che un attore urla [THEME].",
+                "Viene vietato di battere le mani alla fine per non rompere l'incantesimo del [THEME].",
+                "Ogni spettatore deve tenere in bocca un sasso per sentire il silenzio del [THEME]."
+            ],
+            
+            actions: [
+                "leggono i fogli a vista inciampando", "eseguono una danza sgraziata", 
+                "ingaggiano un corpo a corpo", "simulano un naufragio", 
+                "scrivono sui muri con la saliva", "mangiano documenti ufficiali",
+                "corrono in cerchio fino al vomito", "si legano con nastro adesivo",
+                "urlano dentro secchi di metallo", "si lavano i piedi con acqua nera",
+                "smontano un'auto a mani nude", "fissano il pubblico in silenzio",
+                "si scambiano i vestiti freneticamente", "costruiscono torri che crollano",
+                "si scambiano le scarpe in un mucchio gigante", "cantano con la testa in secchi d'acqua",
+                "si passano un blocco di cemento", "cercano di montare una tenda senza istruzioni",
+                "fanno il tiro alla fune cadendo", "si avvolgono nel nastro adesivo",
+                "puliscono il pavimento con i vestiti buoni", "simulano una catena di montaggio del nulla",
+                "leggono il copione al contrario", "formano scritte umane illeggibili",
+                "si mordono le caviglie a vicenda", "mangiano senza posate",
+                "recitano correndo su un tapis roulant", "si lanciano farina addosso",
+                "si abbracciano fino a soffocare", "camminano all'indietro per un'ora",
+                "ripetono la stessa parola finché perde senso", "si coprono di fango a vicenda"
+            ],
+
+            interventions: [
+                "Il Regista ferma tutto: 'Non recitate! Voglio la verità del [THEME]!'",
+                "Il Regista sposta un attore: 'Più urgenza! Il [THEME] non aspetta!'",
+                "La finzione si rompe: il Regista interroga un attore sulla sua vita vera.",
+                "Il Regista spegne le luci: 'Ascoltate il buio del [THEME]'.",
+                "Il Regista mangia in scena mentre gli attori soffrono il [THEME].",
+                "Il Regista confessa il suo fallimento nel rappresentare il [THEME].",
+                "Il Regista ordina al pubblico di alzarsi e fare un gesto per il [THEME].",
+                "Il Regista toglie il microfono all'attrice: 'Bisbiglia. O meglio: pensa'.",
+                "Il Regista entra mangiando una mela: 'Fate finta che io non ci sia'.",
+                "Il Regista separa due attori: 'La solitudine è igienica'.",
+                "Il Regista accende un faro in faccia al protagonista: 'Sii la fotocellula'.",
+                "Il Regista ride sguaiatamente: 'Troppo serio. Ricominciate peggio'.",
+                "Il Regista si sdraia a terra: 'Calpestatemi'.",
+                "Il Regista interrompe il coro: 'Siete troppo intonati'.",
+                "Il Regista prende la testa di un attore: 'Pensa a un sasso'."
+            ],
+            
             actions_prologue: [
                 "Il pubblico viene schedato all'ingresso e privato delle scarpe.",
-                "Gli spettatori devono entrare strisciando sotto un telo di plastica sporco di fango.",
-                "Un attore legge al megafono l'elenco delle sostanze inquinanti presenti nell'aria in tempo reale.",
-                "Viene consegnato a ciascuno un sasso pesante da tenere in mano per tutta la durata dello spettacolo.",
-                "Il pubblico viene diviso per censo all'ingresso: chi ha scarpe di marca va in piccionaia.",
-                "Gli spettatori devono firmare una liberatoria in cui accettano di 'condividere il peso del mondo'.",
-                "Viene chiesto al pubblico di consegnare i cellulari, che vengono chiusi in una gabbia per uccelli.",
-                "Si entra uno alla volta, passando attraverso un metal detector fatto di rami secchi.",
-                "Il pubblico deve indossare maschere bianche anonime per annullare l'individualità.",
-                "All'ingresso viene misurata la temperatura emotiva di ogni spettatore con un termometro finto.",
-                "Bisogna attraversare una vasca di acqua gelida a piedi nudi per accedere alla platea.",
-                "Gli spettatori vengono pesati su una bilancia industriale prima di entrare.",
-                "Un bambino consegna a ciascuno un frammento di specchio rotto dicendo 'questo sei tu'.",
-                "Bisogna compilare un modulo burocratico incomprensibile in una lingua inventata prima di sedersi.",
+                "Gli spettatori devono entrare strisciando sotto un telo di plastica sporco.",
+                "Un attore legge al megafono l'elenco delle sostanze inquinanti.",
+                "Viene consegnato a ciascuno un sasso pesante da tenere in mano.",
+                "Bisogna compilare un modulo burocratico incomprensibile prima di sedersi.",
                 "Gli spettatori vengono bendati e guidati per mano da attori che non parlano.",
-                "Viene spruzzato un profumo di 'pioggia acida' (zolfo e limone) addosso a chi entra.",
-                "Il pubblico deve guardare lo spettacolo attraverso il buco della serratura di venti porte chiuse a chiave.",
-                "Si è costretti a tenere le braccia alzate per i primi 15 minuti in segno di resa collettiva.",
-                "Bisogna indossare cuffie antirumore e intuire le battute solo dal labiale degli attori, sperimentando l'incomunicabilità.",
-                "L'ingresso avviene strisciando dentro un tubo di areazione smontato, uno alla volta."
-            ],
-
-            // AZIONI CENTRALI: Corpo a corpo, lettura a vista, caos.
-            actions_main: [
-                "Gli attori leggono i fogli del copione a vista, inciampando volutamente nelle parole difficili.",
-                "Il coro esegue una danza sgraziata e anti-accademica, simulando il soffocamento collettivo.",
-                "Avviene un 'corpo a corpo' fisico violento con la scenografia pericolante, tra scintille e rumori metallici.",
-                "I migranti insegnano ai borghesi come si respira, in un ribaltamento pedagogico umiliante.",
-                "Si crea un coagulo umano al centro della scena, urlando frasi sconnesse sul tema della perdita.",
-                "Gli attori si scambiano i vestiti in scena, restando nudi per interminabili minuti di silenzio.",
-                "Un attore cerca di scalare la scenografia ma cade ripetutamente, senza finzione.",
-                "Il coro ripete la stessa frase per 15 minuti finché perde di senso e diventa puro suono.",
-                "Viene simulato un naufragio utilizzando solo teli di plastica blu e ventilatori industriali.",
-                "Gli attori scrivono sui muri con gessetti le loro paure e poi le cancellano con la saliva.",
-                "Una marcia funebre viene eseguita soffiando dentro tubi di gomma.",
-                "Un attore mangia un documento ufficiale foglio dopo foglio, bevendo acqua sporca.",
-                "Tutti gli attori corrono in cerchio fino allo sfinimento fisico reale.",
-                "Viene costruito un muro di mattoni veri che separa gli attori dal pubblico, e poi viene abbattuto a calci.",
-                "Gli attori si legano tra loro con nastro adesivo da pacchi fino a formare un unico organismo immobile.",
-                "Un monologo viene urlato dentro un secchio di metallo, rendendolo incomprensibile.",
-                "Vengono lanciati aeroplanini di carta contro un ventilatore industriale che li respinge.",
-                "Gli attori si lavano i piedi a vicenda con acqua nera.",
-                "Un coro di urla mute: gli attori aprono la bocca ma non esce suono.",
-                "Viene smontata un'automobile a mani nude pezzo per pezzo.",
-                "Gli attori imitano il rumore delle macchine della fabbrica con la voce per 20 minuti.",
-                "Si svolge una partita di calcio senza palla, mimando solo la fatica e i falli.",
-                "Gli attori si scambiano le scarpe in un mucchio gigante al centro della scena, impiegando 20 minuti di caos reale e non coreografato per ritrovare il paio sbagliato, metafora dello smarrimento identitario.",
-                "Un coro di urla viene eseguito con la testa immersa in secchi d'acqua, producendo gorgoglii incomprensibili che dovrebbero rappresentare 'la voce soffocata delle periferie'.",
-                "Gli attori cercano di montare una tenda da campeggio della Protezione Civile senza istruzioni, litigando verbalmente tra loro mentre il pubblico aspetta in imbarazzo per mezz'ora."
-            ],
-
-            // NOTE RECITAZIONE: Fragilità, urgenza, anti-accademia.
-            acting_notes: [
-                "La recitazione è volutamente sgrammaticata, incerta, piena di 'sporcature' che testimoniano l'autenticità del dolore contro la finzione accademica.",
-                "Si privilegia l'inciampo, la dimenticanza del testo e il balbettio come forme di resistenza alla dittatura della performance perfetta.",
-                "Gli attori non interpretano personaggi, ma 'portano' la loro biografia come una croce, rifiutando ogni tecnica teatrale.",
-                "Il testo viene letto in modo atono dai fogli, per sottolineare che le parole sono solo un pretesto per l'incontro fisico.",
-                "Le voci sono spesso coperte dai rumori industriali, costringendo gli attori a urlare fino a perdere la voce, in una 'drammaturgia dello sforzo'.",
-                "Chi prova a recitare 'bene' viene guardato con sospetto dagli altri: qui conta solo la 'verità del corpo' sgraziato.",
-                "L'assenza di dizione è elevata a valore politico: ogni accento regionale o straniero è un atto di ribellione.",
-                "Gli attori recitano dando le spalle al pubblico, per negare la spettacolarizzazione del dolore.",
-                "I dialoghi si sovrappongono fino a diventare un rumore bianco incomprensibile.",
-                "Le pause sono dilatate all'infinito, creando un imbarazzo palpabile in sala.",
-                "Gli attori non devono recitare 'il personaggio', ma devono 'stare' in scena come testimoni del proprio disagio. Non vogliamo Amleto, vogliamo persone vere che non sa dove mettere le mani.",
-
-            ],
-
-            // INTERRUZIONE REGISTA: Maieutica, potere, svelamento.
-            actions_director: [
-                "Il Regista entra in scena e ferma tutto col megafono: 'Non recitate! Voglio la vostra verità, non la vostra tecnica!'",
-                "Un conduttore interrompe l'azione per spiegare al pubblico che quello che vedono è una ferita reale, non finzione.",
-                "Il Regista sposta fisicamente un attore gridando: 'Più urgenza! Più dolore! Devi sanguinare metaforicamente!'",
-                "La finzione si rompe: il Regista interroga un rifugiato sulla sua vera storia, mettendolo in imbarazzo.",
-                "Il Regista sale sul palco e corregge la postura di una signora anziana: 'Sia più curva, come il peso della storia!'",
-                "L'azione viene interrotta perché 'non c'è abbastanza pathos', e viene fatta ripetere da capo.",
-                "Il Regista spegne le luci e urla al buio istruzioni incomprensibili sulla 'drammaturgia della luce'.",
-                "Il Regista confessa al microfono di aver fallito e chiede agli attori di improvvisare la loro rabbia.",
-                "Viene introdotto un 'momento di verifica' in cui il Regista chiede al pubblico se ha capito il messaggio.",
-                "Il Regista prende il posto di un attore dicendo 'Faccio io, tu non hai abbastanza vissuto'.",
-                "Il Regista entra mangiando un panino e critica la fame degli attori.",
-                "Viene fermata la musica per fare un minuto di silenzio per 'tutte le vittime del sistema', cronometrato dal Regista.",
-                "Il Regista litiga con il tecnico luci per creare tensione.",
-                "Il Regista sposta fisicamente il pubblico e gli attori, creando un 'coagulo' umano attorno all'azione."
-            ],
-
-            // NOTE REGISTA: Giustificazioni del potere.
-            director_notes: [
-                "Il Regista esercita così la sua 'maieutica' muscolare, estraendo la verità dai corpi anche contro la loro volontà.",
-                "Un atto di violenza pedagogica necessario per rompere la crosta dell'abitudine e mostrare la 'ferita viva'.",
-                "L'interruzione svela il dispositivo di potere teatrale, ma riafferma paradossalmente la centralità assoluta del demiurgo maschio.",
-                "Il Regista si pone come sacerdote del rito, l'unico in grado di incanalare il caos emotivo verso un significato politico corretto.",
-                "Dimostrazione pratica di come la 'partecipazione' sia in realtà un'orchestra diretta da una bacchetta di ferro.",
-                "Il 'non saper fare' degli attori viene così nobilitato dall'intervento esperto che gli conferisce senso artistico.",
-                "La figura del Regista diventa metafora del Padre Padrone benevolo che guida il gregge smarrito.",
-                "L'autorità registica viene esibita per essere contestata (ma mai veramente rovesciata).",
-                "Il meta-teatro diventa l'alibi per giustificare la disorganizzazione scenica."
-            ],
-
-            // EPILOGO: Coro, lezione, restituzione.
-            actions_epilogue: [
-                "Il pubblico è invitato ad alzarsi e ripetere un giuramento collettivo di cittadinanza attiva.",
-                "Vengono distribuiti semi di pianta autoctona da portare a casa come promessa di futuro sostenibile.",
-                "Un bambino prende il microfono e spiega la morale della storia agli adulti, che piangono.",
-                "Tutti cantano una nenia tradizionale mentre la scenografia viene smontata a vista, pezzo per pezzo.",
-                "Gli attori scendono tra il pubblico e abbracciano gli spettatori uno a uno, forzando l'intimità.",
-                "Viene srotolato uno striscione con una domanda retorica: 'E VOI, DA CHE PARTE STATE?'",
-                "Il pubblico deve uscire da una porta diversa da quella d'entrata, 'perché ora siete cambiati'.",
-                "Viene offerto del pane secco al pubblico come gesto di comunione laica.",
-                "Gli attori si sdraiano a terra fingendosi morti e il pubblico deve scavalcarli per uscire.",
-                "Si accendono le luci di sala e nessuno si muove per 10 minuti, in un imbarazzo studiato.",
-                "Viene chiesto al pubblico di lasciare un oggetto personale come pegno di memoria.",
-                "Un anziano legge la Costituzione mentre gli altri attori lo coprono di terra.",
-                "Gli attori consegnano le chiavi di casa (finte) agli spettatori, dicendo 'ora è vostra responsabilità'.",
-                "Viene proiettata la scritta 'FINE?' mentre il coro fischia.",
-                "Il pubblico viene invitato a pulire la scena insieme agli attori."
-            ],
-
-            // NOTE EPILOGO: Pedagogia e senso di colpa.
-            epilogue_notes: [
-                "Un monologo finale spiega esplicitamente al pubblico che la colpa di [THEME] è collettiva e che solo l'attivismo può salvarci.",
-                "La 'lezione' termina con un appello frontale: non basta guardare, bisogna diventare 'spettatori-attori' del cambiamento.",
-                "Il messaggio viene ribadito didascalicamente: il teatro non è evasione, ma uno specchio rotto dove vedere le nostre responsabilità.",
-                "Viene letta una lista di buone pratiche da adottare da domani, trasformando lo spettacolo in un seminario di educazione civica.",
-                "Il pubblico viene colpevolizzato per il suo silenzio, in un finale che rifiuta la catarsi per lasciare un senso di disagio etico.",
-                "La chiusura è un inno alla resilienza delle periferie, cantato in coro per forzare un senso di comunità istantanea.",
-                "Non c'è scioglimento dei conflitti, solo la presa d'atto che 'siamo tutti sulla stessa barca che affonda'.",
-                "La morale della favola viene servita fredda, senza possibilità di replica o interpretazione personale.",
-                "Il finale è volutamente aperto e insoddisfacente, per spingere alla riflessione post-spettacolo."
-            ],
-
-            // VIDEODISEGNO LIVE: Mapping su superfici irregolari.
-            video_mapping: [
-                "Sui muri scrostati vengono proiettati disegni fatti dal vivo con una tavoletta grafica, che illustrano i sogni dei protagonisti (uccelli, case).",
-                "Un artista visivo disegna in diretta le sagome degli spettatori, trasformandole in uccelli migratori.",
-                "Videoproiezioni di mappe catastali e confini scorrono sui corpi sudati degli attori come tatuaggi di luce.",
-                "La parola 'RESISTENZA' viene scritta e cancellata in loop su un telo trasparente posto davanti alla scena.",
-                "Vengono proiettati i primi piani degli occhi degli attori, ingigantiti a dismisura sulle pareti del capannone.",
-                "Scorrono filmati d'archivio di vecchie proteste sindacali mixati con immagini di droni.",
-                "Un proiettore mostra in diretta la reazione del pubblico ripreso a sua insaputa.",
-                "Le ombre degli attori vengono moltiplicate digitalmente fino a riempire tutto lo spazio visivo.",
-                "Vengono proiettati dati statistici sulla povertà in font giganti che scorrono veloci.",
-                "Disegni infantili di case in fiamme vengono animati in stop-motion sulle rovine.",
-                "Frasi poetiche appaiono e scompaiono sul pavimento, costringendo il pubblico a leggere camminando.",
-                "Il volto del Regista viene proiettato in sovrimpressione su tutto, come un Grande Fratello benevolo.",
-                "Vengono proiettate radiografie di polmoni sani e malati in alternanza stroboscopica.",
-                "Codici a barre vengono proiettati sulle fronti degli spettatori."
-            ],
-
-            // FRUIZIONE PUNITIVA: Disagio fisico.
-            fruition_punitive: [
-                "Gli spettatori devono restare in ginocchio su ghiaia per la prima ora.",
-                "Il pubblico deve reggere pesanti travi di legno per tutto il tempo, diventando parte della scenografia.",
-                "Si viene bendati e guidati bruscamente in un percorso a ostacoli tra le macerie.",
-                "L'ingresso è consentito solo dopo aver firmato una liberatoria per i rischi fisici e aver lasciato fuori i documenti.",
-                "Gli spettatori sono costretti a stare stipati in un container buio per 20 minuti prima dell'inizio.",
-                "Non ci sono sedie: il pubblico deve rimanere in equilibrio su assi di legno instabili.",
-                "Vengono distribuite cuffie che trasmettono rumore bianco ad alto volume per isolare i partecipanti.",
-                "Il pubblico viene diviso in gruppi e rinchiuso in gabbie metalliche per osservare la scena attraverso le sbarre.",
-                "Si è obbligati a togliere le giacche anche se la temperatura nel capannone è di 5 gradi.",
-                "Il pubblico deve pedalare su vecchie cyclette per generare l'elettricità per le luci di scena.",
-                "Gli spettatori sono costretti a guardare lo spettacolo riflesso in pozzanghere d'acqua.",
-                "Bisogna tenere le braccia alzate per sostenere un telo che copre la scena.",
-                "Il pubblico è seduto su blocchi di ghiaccio che si sciolgono durante la performance.",
-                "Gli spettatori sono legati a coppie con fascette da elettricista.",
-                "Ogni spettatore deve tenere in bocca un sasso per 'sentire il silenzio'.",
-                "Il pubblico è costretto a stare sdraiato supino guardando il soffitto mentre l'azione avviene intorno.",
-                "Viene vietato di battere le mani alla fine per non 'rompere l'incantesimo del dolore'."
+                "Viene spruzzato un profumo di 'pioggia acida' addosso a chi entra.",
+                "All'ingresso viene timbrata la mano di ogni spettatore con la parola 'COLPEVOLE'.",
+                "Si deve camminare sopra le foto della propria città.",
+                "Un bambino consegna un frammento di specchio rotto dicendo 'questo sei tu'.",
+                "Bisogna attraversare una vasca di acqua gelida a piedi nudi.",
+                "Gli spettatori vengono pesati su una bilancia industriale.",
+                "Viene chiesto di lasciare i documenti all'ingresso in cambio di un numero."
             ]
         };
 
         function pick(array) {
             return array[Math.floor(Math.random() * array.length)];
         }
+        
+        function combine(template, data) {
+            let text = template;
+            // Sostituzioni base
+            text = text.replace(/\[THEME\]/g, data.theme);
+            text = text.replace(/\[PLACE\]/g, data.place);
+            
+            // Sostituzioni grammaticali (sceglie a caso ogni volta che trova il tag)
+            // Loop per assicurarsi che se ci sono più tag uguali vengano sostituiti tutti con valori diversi
+            const maxLoops = 10;
+            let loopCount = 0;
+            while ((text.includes("[ADJ]") || text.includes("[NOUN]") || text.includes("[VERB]") || text.includes("[MATERIAL]") || text.includes("[ACTION]") || text.includes("[GROUP]")) && loopCount < maxLoops) {
+                text = text.replace("[ADJ]", pick(LEXICON.adj));
+                text = text.replace("[NOUN]", pick(LEXICON.noun));
+                text = text.replace("[VERB]", pick(LEXICON.verb));
+                text = text.replace("[MATERIAL]", pick(LEXICON.materials));
+                text = text.replace("[ACTION]", pick(DB.device_actions));
+                text = text.replace("[GROUP]", pick(DB.cast_groups));
+                loopCount++;
+            }
+            return text;
+        }
 
-        // --- 2. GESTIONE MODALITÀ ---
+        let lastOfflineHtml = "";
+        let aiEnabled = false;
+        let isEditing = false;
 
+        // --- MODALITÀ OFFLINE: GENERATORE COMBINATORIO ---
+        
+        function generatePlayOffline() {
+            document.getElementById('loadingSection').classList.remove('hidden');
+            document.getElementById('outputSection').classList.add('hidden');
+            const intervalId = rotateLoadingText();
+
+            setTimeout(() => {
+                const theme = document.getElementById('theme').value.trim() || "Il Vuoto";
+                const place = document.getElementById('place').value.trim() || "La Periferia";
+                const data = { theme, place };
+                
+                // Generazione Titolo
+                const title = `"${pick(DB.titles_prefix)} ${pick(DB.titles_suffix)}"`;
+                const subtitle = combine(pick(DB.subtitles_templates), data);
+
+                let html = `<h3>${title}</h3><p><strong>${subtitle}</strong></p>`;
+                
+                // Luogo
+                html += `<h3>IL LUOGO (LA FERITA)</h3><p>${combine(pick(DB.places_templates), data)}</p>`;
+
+                // Dispositivo
+                if (document.getElementById('chk_metafore').checked) {
+                    html += `<h3>IL DISPOSITIVO (LA METAFORA)</h3><p>${combine(pick(DB.device_templates), data)}</p>`;
+                }
+
+                // Video
+                if (document.getElementById('chk_video').checked) {
+                    html += `<h3>VIDEODISEGNO LIVE</h3><p>Su una superficie di [MATERIAL], un artista disegna in diretta il [NOUN] del [THEME], creando un effetto [ADJ].</p>`.replace("[MATERIAL]", pick(LEXICON.materials)).replace("[NOUN]", pick(LEXICON.noun)).replace(/\[THEME\]/g, theme).replace("[ADJ]", pick(LEXICON.adj));
+                }
+
+                // Cast
+                html += `<h3>LA COMUNITÀ IN SCENA</h3>`;
+                let group1 = pick(DB.cast_groups);
+                let group2 = pick(DB.cast_groups);
+                while(group1 === group2) group2 = pick(DB.cast_groups); // Evita doppioni
+                
+                let castText = `Un cast eterogeneo composto da ${group1} e ${group2}.`;
+                if (document.getElementById('chk_idealizzazione').checked) {
+                    let noteTemplate = pick(DB.cast_notes_templates);
+                    noteTemplate = noteTemplate.replace("[GROUP]", group1);
+                    castText += ` <br><em>${combine(noteTemplate, data)}</em>`;
+                }
+                html += `<p>${castText}</p>`;
+
+                // Fruizione
+                if (document.getElementById('chk_fruizione').checked) {
+                    html += `<h3>FRUIZIONE PUNITIVA</h3><p>${combine(pick(DB.fruition_templates), data)}</p>`;
+                }
+
+                // Svolgimento
+                html += `<h3>SVOLGIMENTO DELL'AZIONE</h3><ul>`;
+                html += `<li><strong>Prologo:</strong> ${pick(DB.actions_prologue)}</li>`;
+                
+                let actText = combine("Gli attori [VERB] il [MATERIAL] in un atto di [NOUN] collettivo.", data); 
+                actText += " " + pick(DB.actions);
+                
+                if (document.getElementById('chk_estetica').checked) {
+                    actText += ` (Nota: La recitazione è volutamente [ADJ] e piena di inciampi per restituire l'urgenza del [THEME]).`.replace("[ADJ]", pick(LEXICON.adj)).replace(/\[THEME\]/g, theme);
+                }
+                html += `<li><strong>Il Rito Centrale:</strong> ${actText}</li>`;
+
+                if (document.getElementById('chk_patriarcato').checked) {
+                    html += `<li><strong>L'Interruzione Maieutica:</strong> ${combine(pick(DB.interventions), data)}</li>`;
+                }
+
+                let epiText = "Il pubblico viene invitato a compiere un gesto [ADJ] insieme agli attori.".replace("[ADJ]", pick(LEXICON.adj));
+                if (document.getElementById('chk_moralismo').checked) {
+                    epiText += ` Un monologo finale spiega che siamo tutti colpevoli del [THEME] e dobbiamo fare [NOUN].`.replace(/\[THEME\]/g, theme).replace("[NOUN]", pick(LEXICON.noun));
+                }
+                html += `<li><strong>Epilogo:</strong> ${epiText}</li></ul>`;
+
+                clearInterval(intervalId);
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('scriptContent').innerHTML = html;
+                document.getElementById('outputSection').classList.remove('hidden');
+                lastOfflineHtml = html;
+                disableEditing();
+
+            }, 1500);
+        }
+
+        // 4. GENERAZIONE ONLINE (OpenAI API - POTENZIATA IBRIDA) ---
+        
+        async function generatePlayOnline(apiKey, draftHtmlOverride) {
+            const theme = document.getElementById('theme').value.trim() || "Il Vuoto";
+            const place = document.getElementById('place').value.trim() || "La Periferia";
+            
+            // COSTRUZIONE BOZZA OFFLINE PER AI (stessa struttura dell'output combinatorio)
+            const data = { theme, place };
+            const draft_title = `"${pick(DB.titles_prefix)} ${pick(DB.titles_suffix)}"`;
+            const draft_subtitle = combine(pick(DB.subtitles_templates), data);
+            const draft_place = combine(pick(DB.places_templates), data);
+            const draft_device = combine(pick(DB.device_templates), data);
+            const draft_cast_group1 = pick(DB.cast_groups);
+            let draft_cast_group2 = pick(DB.cast_groups);
+            while (draft_cast_group2 === draft_cast_group1) draft_cast_group2 = pick(DB.cast_groups);
+            const draft_cast_note = document.getElementById('chk_idealizzazione').checked ? combine(pick(DB.cast_notes_templates).replace("[GROUP]", draft_cast_group1), data) : "";
+            const draft_cast = `Un cast eterogeneo composto da ${draft_cast_group1} e ${draft_cast_group2}. ${draft_cast_note}`;
+            const draft_punishment = document.getElementById('chk_fruizione').checked ? combine(pick(DB.fruition_templates), data) : "";
+            const draft_prologue = pick(DB.actions_prologue);
+            const draft_main = combine("Gli attori [VERB] il [MATERIAL] in un atto di [NOUN] collettivo.", data) + " " + pick(DB.actions);
+            const draft_director = combine(pick(DB.interventions), data);
+            const draft_epilogue = "Il pubblico viene invitato a compiere un gesto [ADJ] insieme agli attori. Un monologo finale spiega che siamo tutti colpevoli del [THEME] e dobbiamo fare [NOUN]."
+                .replace("[ADJ]", pick(LEXICON.adj))
+                .replace(/\[THEME\]/g, theme)
+                .replace("[NOUN]", pick(LEXICON.noun));
+
+            const includeMetafore = document.getElementById('chk_metafore').checked;
+            const includeVideo = document.getElementById('chk_video').checked;
+            const includeEstetica = document.getElementById('chk_estetica').checked;
+            const includePatriarcato = document.getElementById('chk_patriarcato').checked;
+            const includeMoralismo = document.getElementById('chk_moralismo').checked;
+
+            let draftHtml = draftHtmlOverride || "";
+            if (!draftHtml) {
+                draftHtml = `<h3>${draft_title}</h3><p><strong>${draft_subtitle}</strong></p>`;
+                draftHtml += `<h3>IL LUOGO (LA FERITA)</h3><p>${draft_place}</p>`;
+
+                if (includeMetafore) {
+                    draftHtml += `<h3>IL DISPOSITIVO (LA METAFORA)</h3><p>${draft_device}</p>`;
+                }
+
+                if (includeVideo) {
+                    const videoChunk = `<h3>VIDEODISEGNO LIVE</h3><p>Su una superficie di [MATERIAL], un artista disegna in diretta il [NOUN] del [THEME], creando un effetto [ADJ].</p>`
+                        .replace("[MATERIAL]", pick(LEXICON.materials))
+                        .replace("[NOUN]", pick(LEXICON.noun))
+                        .replace(/\[THEME\]/g, theme)
+                        .replace("[ADJ]", pick(LEXICON.adj));
+                    draftHtml += videoChunk;
+                }
+
+                draftHtml += `<h3>LA COMUNIT? IN SCENA</h3><p>${draft_cast}</p>`;
+
+                if (draft_punishment) {
+                    draftHtml += `<h3>FRUIZIONE PUNITIVA</h3><p>${draft_punishment}</p>`;
+                }
+
+                draftHtml += `<h3>SVOLGIMENTO DELL'AZIONE</h3><ul>`;
+                draftHtml += `<li><strong>Prologo:</strong> ${draft_prologue}</li>`;
+                let ritoCentrale = draft_main;
+                if (includeEstetica) {
+                    ritoCentrale += ` (Nota: La recitazione ? volutamente [ADJ] e piena di inciampi per restituire l'urgenza del [THEME]).`
+                        .replace("[ADJ]", pick(LEXICON.adj))
+                        .replace(/\[THEME\]/g, theme);
+                }
+                draftHtml += `<li><strong>Il Rito Centrale:</strong> ${ritoCentrale}</li>`;
+                if (includePatriarcato) {
+                    draftHtml += `<li><strong>L'Interruzione Maieutica:</strong> ${draft_director}</li>`;
+                }
+                let epilogoText = draft_epilogue;
+                if (!includeMoralismo) {
+                    epilogoText = "Il pubblico viene invitato a compiere un gesto [ADJ] insieme agli attori."
+                        .replace("[ADJ]", pick(LEXICON.adj));
+                }
+                draftHtml += `<li><strong>Epilogo:</strong> ${epilogoText}</li></ul>`;
+            }
+
+            const systemPrompt = `
+Sei l'Alter Ego Digitale di Pietro Floridia (Regista di Teatro Sociale Impegnato).
+Correggi errori di sintassi/grammatica e aumenta la coerenza semantica rispetto al TEMA "${theme}" e al LUOGO "${place}".
+Mantieni e accentua il tono parodistico e scomodo del teatro sociale, esagerando i difetti ma restando aderente al tema/luogo.
+Lessico obbligatorio da inserire con naturalezza: meticciato, dispositivo, attraversamento, ferita, maieutica, sbiancamento, habitat, humus, corpo a corpo, coagulo, urgenza, restituzione, inciampo, polifonia, sconfinamento, fragilit?, fardello dell'uomo bianco.
+Non aggiungere o rimuovere sezioni, non cambiare l'ordine dei tag; non inserire testo fuori dai tag forniti.`;
+
+            const userPromptContent = `
+Riscrivi questo HTML mantenendo tag e ordine. Puoi cambiare SOLO il testo interno per correggere grammatica, dare coerenza al tema "${theme}" e al luogo "${place}", e mantenere il tono proletario/brutalista/parodico.
+Inserisci dettagli sensoriali coerenti con tema e luogo. Mantieni o esaspera i difetti del teatro sociale.
+Ecco il canovaccio da riscrivere:
+${draftHtml}
+`;
+
+            document.getElementById('loadingSection').classList.remove('hidden');
+            document.getElementById('outputSection').classList.add('hidden');
+            const intervalId = rotateLoadingText();
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: userPromptContent }
+                        ],
+                        temperature: 0.65,
+                        max_tokens: 700
+                    })
+                });
+                if (!response.ok) throw new Error(`Errore API: ${response.status}`);
+                const result = await response.json();
+                const aiHtml = result?.choices?.[0]?.message?.content?.trim() || "";
+                const hasStructure = aiHtml.includes("<h3") && aiHtml.includes("<ul") && aiHtml.includes("<li");
+                if (!hasStructure) throw new Error("Risposta AI non valida, uso modalita' offline.");
+                document.getElementById('scriptContent').innerHTML = aiHtml;
+                document.getElementById('outputSection').classList.remove('hidden');
+                disableEditing();
+            } catch (e) {
+                alert("Errore AI: " + e.message + ". Uso modalita' offline.");
+                generatePlayOffline();
+            } finally {
+                clearInterval(intervalId);
+                document.getElementById('loadingSection').classList.add('hidden');
+            }
+        }
+
+        // Utils
         function updateMode() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const badge = document.getElementById('modeIndicator');
-            if (apiKey.length > 10) {
+            if (apiKey.length > 10 && aiEnabled) {
                 badge.className = "mode-badge mode-online";
-                badge.innerText = "MODALITÀ AI (GPT)";
+                badge.innerText = "MODALITA' AI (GPT)";
             } else {
                 badge.className = "mode-badge mode-offline";
-                badge.innerText = "MODALITÀ OFFLINE";
+                badge.innerText = "MODALITA' OFFLINE";
             }
+            updateAIToggleButton();
         }
 
         function dispatchGeneration() {
             const apiKey = document.getElementById('apiKey').value.trim();
-            if (apiKey.length > 10) {
-                generatePlayOnline(apiKey);
+            if (aiEnabled && apiKey.length > 10) {
+                const seedHtml = lastOfflineHtml || document.getElementById('scriptContent').innerHTML.trim();
+                generatePlayOnline(apiKey, seedHtml);
             } else {
+                aiEnabled = false;
                 generatePlayOffline();
+                updateMode();
             }
         }
 
-        const loadingMessages = [
-            "Costruendo metafore in cartapesta...",
-            "Accumulando oggetti ingombranti...",
-            "Cercando attori che non sappiano recitare...",
-            "Calcolando il disagio del pubblico...",
-            "Scrivendo il finale moraleggiante...",
-            "Ideando strutture pericolanti...",
-            "Mescolando le biografie...",
-            "Generando un titolo pretenzioso...",
-            "Consultando l'archivio delle ferite urbane...",
-            "Recuperando macerie nobili...",
-            "Sbiancando la memoria collettiva..."
-        ];
-
         function rotateLoadingText() {
+            const loadingMessages = ["Praticando il meticciato...", "Cercando materiali di scarto...", "Sbiancando la memoria...", "Evocando il disagio...", "Costruendo metafore ingombranti...", "Calcolando il peso dell'assenza..."];
             const textEl = document.getElementById('loadingText');
             let i = 0;
             return setInterval(() => {
@@ -719,246 +798,88 @@
                 i = (i + 1) % loadingMessages.length;
             }, 1500);
         }
-
-        // --- 3. GENERAZIONE OFFLINE (Randomica) ---
-
-        function generatePlayOffline() {
-            // UI Setup
-            document.getElementById('loadingSection').classList.remove('hidden');
-            document.getElementById('outputSection').classList.add('hidden');
-            const intervalId = rotateLoadingText();
-
-            // Simulazione ritardo di pensiero
-            setTimeout(() => {
-                const theme = document.getElementById('theme').value.trim() || "Il Vuoto";
-                const place = document.getElementById('place').value.trim() || "La Periferia";
-                
-                // Get Checkboxes
-                const hasMetafore = document.getElementById('chk_metafore').checked;
-                const hasVideo = document.getElementById('chk_video').checked;
-                const hasIdealizzazione = document.getElementById('chk_idealizzazione').checked;
-                const hasEstetica = document.getElementById('chk_estetica').checked;
-                const hasFruizione = document.getElementById('chk_fruizione').checked;
-                const hasMoralismo = document.getElementById('chk_moralismo').checked;
-                const hasPatriarcato = document.getElementById('chk_patriarcato').checked;
-
-                // Generazione Testo
-                const title = `"${pick(DB.titles_prefix)} ${pick(DB.titles_suffix)}"`;
-                
-                // Generazione Sottotitolo Dinamico
-                const subtitleRaw = pick(DB.subtitles_templates);
-                const subtitle = subtitleRaw.replace("[THEME]", theme);
-
-                let html = `<h3>${title}</h3>`;
-                html += `<p><strong>${subtitle}</strong></p>`;
-                
-                // Generazione Luogo Dinamico
-                const placeTemplate = pick(DB.places_templates);
-                const placeAdj = pick(DB.places_adjectives);
-                const placeDesc = placeTemplate
-                    .replace("[PLACE]", place)
-                    .replace("[ADJECTIVE]", placeAdj);
-
-                html += `<h3>IL LUOGO (LA FERITA)</h3>`;
-                html += `<p>${placeDesc}</p>`;
-
-                if (hasMetafore) {
-                    html += `<h3>IL DISPOSITIVO (LA METAFORA INGOMBRANTE)</h3>`;
-                    html += `<p>Al centro dello spazio troneggia <strong>${pick(DB.metaphors_objects)}</strong>. ${pick(DB.device_descriptions)}</p>`;
-                }
-
-                if (hasVideo) {
-                    html += `<h3>VIDEODISEGNO LIVE</h3>`;
-                    html += `<p>${pick(DB.video_mapping)} Questa tecnica serve a didascalizzare visivamente il concetto di "${theme}".</p>`;
-                }
-
-                html += `<h3>LA COMUNITÀ IN SCENA</h3>`;
-                let castDesc = `Un cast di 60 persone composto da ${pick(DB.cast_groups)} e ${pick(DB.cast_groups)}.`;
-                if (hasIdealizzazione) {
-                    castDesc += ` <br><em>${pick(DB.cast_notes)}</em>`;
-                }
-                html += `<p>${castDesc}</p>`;
-
-                if (hasFruizione) {
-                    html += `<h3>FRUIZIONE PUNITIVA</h3>`;
-                    let punizione = pick(DB.fruition_punitive);
-                    html += `<p>Il pubblico non ha sedie. ${punizione}</p>`;
-                }
-
-                html += `<h3>SVOLGIMENTO DELL'AZIONE</h3><ul>`;
-                html += `<li><strong>Prologo:</strong> ${pick(DB.actions_prologue)}</li>`;
-                
-                let actionText = pick(DB.actions_main);
-                if (hasEstetica) {
-                    actionText += ` ${pick(DB.acting_notes)}`;
-                }
-                html += `<li><strong>Il Rito Centrale:</strong> ${actionText}</li>`;
-
-                if (hasPatriarcato) {
-                    html += `<li><strong>L'Interruzione Maieutica:</strong> ${pick(DB.actions_director)} ${pick(DB.director_notes)}</li>`;
-                }
-
-                let epilogueText = pick(DB.actions_epilogue);
-                if (hasMoralismo) {
-                    let moralNote = pick(DB.epilogue_notes).replace("[THEME]", theme);
-                    epilogueText += ` ${moralNote}`;
-                }
-                html += `<li><strong>Epilogo:</strong> ${epilogueText}</li>`;
-                html += `</ul>`;
-
-                // Renderizza
-                clearInterval(intervalId);
-                document.getElementById('loadingSection').classList.add('hidden');
-                document.getElementById('scriptContent').innerHTML = html;
-                document.getElementById('outputSection').classList.remove('hidden');
-
-            }, 2000); // 2 secondi di caricamento finto
+        
+        function updateAIToggleButton() {
+            const btn = document.getElementById('aiToggleBtn');
+            if (!btn) return;
+            btn.innerText = aiEnabled ? "Disattiva IA" : "Attiva IA (GPT)";
+            btn.className = aiEnabled
+                ? "w-full bg-black text-white font-bold py-2 text-sm border-2 border-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                : "w-full bg-red-600 text-white font-bold py-2 text-sm border-2 border-black hover:bg-black hover:text-white transition-colors";
         }
 
-      // --- 4. GENERAZIONE ONLINE (OpenAI API - POTENZIATA IBRIDA) ---
-
-        async function generatePlayOnline(apiKey) {
-            const theme = document.getElementById('theme').value.trim() || "Il Vuoto";
-            const place = document.getElementById('place').value.trim() || "La Periferia";
-            
-            // 1. COSTRUZIONE DELLA BOZZA "OFFLINE" (Il Canovaccio Floridiano)
-            // Usiamo il database locale per creare una struttura solida e piena di cliché corretti
-            
-            const draft_title = `"${pick(DB.titles_prefix)} ${pick(DB.titles_suffix)}"`;
-            const draft_subtitle = pick(DB.subtitles_templates).replace("[THEME]", theme);
-            
-            // Luogo base dal DB
-            const place_adj = pick(DB.places_adjectives);
-            const draft_place_base = pick(DB.places_templates)
-                                    .replace("[PLACE]", place)
-                                    .replace("[ADJECTIVE]", place_adj);
-
-            // Dispositivo base dal DB
-            const draft_device_base = `Al centro: ${pick(DB.metaphors_objects)}. ${pick(DB.device_descriptions)}`;
-            
-            // Cast base dal DB
-            const draft_cast_base = `${pick(DB.cast_groups)} e ${pick(DB.cast_groups)}. ${pick(DB.cast_notes)}`;
-            
-            // Azioni base dal DB
-            const draft_prologue = pick(DB.actions_prologue);
-            const draft_main = `${pick(DB.actions_main)} ${pick(DB.acting_notes)}`;
-            const draft_director = `${pick(DB.actions_director)} ${pick(DB.director_notes)}`;
-            const draft_epilogue = `${pick(DB.actions_epilogue)} ${pick(DB.epilogue_notes).replace("[THEME]", theme)}`;
-            const draft_punishment = pick(DB.fruition_punitive);
-
-            // 2. COSTRUZIONE DEL PROMPT PER GPT
-            // Chiediamo all'IA di lavorare SU QUESTA BOZZA, non da zero.
-            
-            const userPromptContent = `
-                ECCO UNA BOZZA DI SPETTACOLO GENERATA DAL DATABASE (Stile Pietro Floridia):
-                
-                TITOLO: ${draft_title}
-                SOTTOTITOLO: ${draft_subtitle}
-                LUOGO (Base): ${draft_place_base}
-                DISPOSITIVO (Base): ${draft_device_base}
-                CAST (Base): ${draft_cast_base}
-                FRUIZIONE PUNITIVA (Base): ${draft_punishment}
-                
-                SVOLGIMENTO (Base):
-                - Prologo: ${draft_prologue}
-                - Azione: ${draft_main}
-                - Interruzione: ${draft_director}
-                - Epilogo: ${draft_epilogue}
-
-                ---
-                
-                IL TUO COMPITO (DRAMMATURGO REVISORE):
-                Prendi questa bozza e RISCRIVILA per renderla PERFETTAMENTE ADERENTE al TEMA: "${theme}" e al LUOGO: "${place}".
-                
-                REGOLE DI RISCRITTURA:
-                1. Mantieni la struttura e il tono involontariamente ironico della bozza (come velata parodia del teatro sociale). Devi mimare perfettamente lo stile delle sinossi teatrali e note di regia. Devei essere specifico (dettagli precisi).
-                2. MODIFICA GLI OGGETTI E I MATERIALI: Se la bozza dice "sedie" ma il tema è "Acqua", trasformale in "sedie galleggianti" o "fusti d'acqua". Usa i dettagli del Luogo "${place}" per modificare la scenografia (es. usa i detriti specifici di quel luogo).
-                3. AGGIUNGI INVENZIONI INEDITE: Inserisci dettagli sensoriali (odori, rumori specifici e oggetti del tema e luogo proposta dall'utente) che non sono nel database.
-                4. ESASPERA I DIFETTI: Rendi la fruizione ancora più scomoda e la recitazione ancora più imbarazzante, collegandole al tema (es. "Il pubblico deve stare in apnea per capire l'acqua").
-                
-                STRUTTURA OUTPUT OBBLIGATORIA (Usa HTML semplice):
-                <h3>TITOLO</h3>
-                <p>...</p>
-                <h3>SOTTOTITOLO</h3>
-                <p>...</p>
-                <h3>IL LUOGO</h3>
-                <p>...</p>
-                <h3>IL DISPOSITIVO</h3>
-                <p>...</p>
-                <h3>CAST</h3>
-                <p>...</p>
-                <h3>FRUIZIONE PUNITIVA</h3>
-                <p>...</p>
-                <h3>SVOLGIMENTO</h3>
-                <ul>...</ul>
-            `;
-
-            document.getElementById('loadingSection').classList.remove('hidden');
-            document.getElementById('outputSection').classList.add('hidden');
-            const intervalId = rotateLoadingText();
-
-            const systemPrompt = `
-                Sei l'Alter Ego Digitale di Pietro Floridia (Regista di Teatro Sociale Impegnato).
-                Il tuo compito è prendere un canovaccio esistente e "sporcarlo" con la realtà specifica del tema e del luogo indicati, usando il tuo lessico caratteristico.
-                
-                VOCABOLARIO OBBLIGATORIO (Usa questi termini il più possibile):
-                - "Meticciato" / "Mescolanza" (Concetto chiave)
-                - "Dispositivo" (per riferirti alla scenografia o alla struttura)
-                - "Attraversamento" (fisico e simbolico)
-                - "Ferita" (riferito al luogo o alla società)
-                - "Maieutica" (il tuo metodo di lavoro direttivo)
-                - "Sbiancamento" (il male da combattere, l'omologazione)
-                - "Habitat" / "Humus" (invece di "ambiente")
-                - "Corpo a corpo" (con la realtà, con il testo)
-                - "Coagulo" (riferito a gruppi di persone o tensioni)
-                - "Urgenza" (la giustificazione per la scarsa qualità tecnica)
-                - "Restituzione" (invece di spettacolo)
-                - "Inciampo" (errore valorizzato)
-                - "Polifonia" (caos di voci)
-                - "Sconfinamento" (uscire dai ruoli)
-                - "Fragilità" (valore supremo)
-                - "Corpo a corpo"
-                - "Fardello dell'uomo bianco"
-            `;
-
-            try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-3.5-turbo",
-                        messages: [
-                            { role: "system", content: systemPrompt },
-                            { role: "user", content: userPromptContent }
-                        ],
-                        temperature: 0.85 // Alta temperatura per favorire le "invenzioni"
-                    })
-                });
-
-                if (!response.ok) throw new Error(`Errore API: ${response.status}`);
-                const data = await response.json();
-                
-                document.getElementById('scriptContent').innerHTML = data.choices[0].message.content;
-                document.getElementById('outputSection').classList.remove('hidden');
-
-            } catch (error) {
-                alert("Errore AI: " + error.message + ". Passo alla modalità offline.");
-                generatePlayOffline(); // Fallback to offline
-            } finally {
-                clearInterval(intervalId);
-                document.getElementById('loadingSection').classList.add('hidden');
+        function toggleAI() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!aiEnabled) {
+                if (apiKey.length <= 10) {
+                    alert("Inserisci una chiave API valida per attivare la IA.");
+                    return;
+                }
+                aiEnabled = true;
+                updateMode();
+                const existingHtml = lastOfflineHtml || document.getElementById('scriptContent').innerHTML.trim();
+                if (existingHtml) {
+                    generatePlayOnline(apiKey, existingHtml);
+                    return;
+                }
+            } else {
+                aiEnabled = false;
             }
+            updateMode();
         }
 
         function copyToClipboard() {
             const content = document.getElementById('scriptContent').innerText;
-            navigator.clipboard.writeText(content).then(() => {
-                alert("Copiato! Pronto per il bando.");
-            });
+            navigator.clipboard.writeText(content).then(() => alert("Copiato!"));
         }
+        
+        function toggleEditMode() {
+            isEditing = !isEditing;
+            const contentEl = document.getElementById('scriptContent');
+            const hint = document.getElementById('editHint');
+            contentEl.contentEditable = isEditing ? "true" : "false";
+            contentEl.classList.toggle('ring-2', isEditing);
+            contentEl.classList.toggle('ring-red-500', isEditing);
+            if (hint) {
+                hint.classList.toggle('hidden', !isEditing);
+            }
+        }
+
+        function disableEditing() {
+            const contentEl = document.getElementById('scriptContent');
+            const hint = document.getElementById('editHint');
+            isEditing = false;
+            contentEl.contentEditable = "false";
+            contentEl.classList.remove('ring-2', 'ring-red-500');
+            if (hint) hint.classList.add('hidden');
+        }
+
+        function saveEditedContent() {
+            const contentEl = document.getElementById('scriptContent');
+            lastOfflineHtml = contentEl.innerHTML;
+            disableEditing();
+            alert("Modifiche salvate nella sessione corrente.");
+        }
+
+        function exportPDF() {
+            const contentHtml = document.getElementById('scriptContent').innerHTML;
+            const w = window.open('', '_blank', 'width=800,height=1000');
+            if (!w) return;
+            w.document.write(`
+                <html><head><title>Progetto Teatro Sociale</title>
+                <style>
+                    body { font-family: 'Courier Prime', monospace; padding: 24px; }
+                    h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; background: #000; color: #fff; display:inline-block; padding: 4px 8px; }
+                    strong { background: #ff0; }
+                </style>
+                </head><body>${contentHtml}</body></html>
+            `);
+            w.document.close();
+            w.focus();
+            w.print();
+        }
+
+        updateAIToggleButton();
     </script>
 </body>
 </html>
